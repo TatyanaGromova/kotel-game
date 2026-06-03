@@ -1,8 +1,8 @@
+@import './styles/effects.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import './styles/effects.css';
 
 @layer base {
   html {
