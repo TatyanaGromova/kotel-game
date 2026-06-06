@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const LOGO_SRC = `${import.meta.env.BASE_URL}assets/logo/logo-kotel.png`
+const LOGO_SRC = `${import.meta.env.BASE_URL}assets/logo/logo-kotel.png?v=2`
 
 type LogoSize = 'sm' | 'md' | 'lg' | 'hero'
 
@@ -27,7 +27,7 @@ export function KotelLogo({ size = 'md', showText = true, className = '' }: Kote
         <img
           src={LOGO_SRC}
           alt="КотёлЪ"
-          className={`${s.img} object-contain`}
+          className={`${s.img} rounded-full object-contain`}
           onError={() => setImgError(true)}
         />
       ) : (
