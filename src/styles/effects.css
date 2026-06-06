@@ -177,6 +177,42 @@
   animation: screen-shake 0.45s ease-in-out;
 }
 
+@keyframes cell-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+  }
+  75% {
+    transform: translateX(-1px);
+  }
+}
+
+.pipe-cell-shake {
+  animation: cell-shake 0.28s ease-in-out;
+}
+
+.puzzle-status-broken {
+  color: #94a3b8;
+}
+
+.puzzle-status-almost {
+  color: #fbbf24;
+}
+
+.puzzle-status-connected {
+  color: #60a5fa;
+}
+
+.puzzle-status-solved {
+  color: #fb923c;
+}
+
 /* === Вспышка === */
 @keyframes flash-burst {
   0% {

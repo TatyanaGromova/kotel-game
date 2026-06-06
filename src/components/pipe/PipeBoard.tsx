@@ -12,6 +12,8 @@ interface PipeBoardProps {
   solved: boolean
   radiatorLit: boolean
   hintKey: string | null
+  shakeKey: string | null
+  showBlockLegend?: boolean
   onRotate: (row: number, col: number) => void
 }
 
@@ -32,13 +34,23 @@ export function PipeBoard({
   solved,
   radiatorLit,
   hintKey,
+  shakeKey,
+  showBlockLegend = false,
   onRotate,
 }: PipeBoardProps) {
   const rows = cells.length
   const cols = cells[0].length
+  const maxWidth = cols >= 6 ? '420px' : cols >= 5 ? '360px' : '300px'
 
   return (
-    <div className="flex items-stretch justify-center gap-2 sm:gap-3">
+    <div className="flex flex-col items-center gap-2">
+      {showBlockLegend && (
+        <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-steel-500">
+          <span className="inline-block h-3 w-3 rounded border border-steel-600/50 bg-graphite-950" />
+          Засор — обходите
+        </div>
+      )}
+    <div className="flex w-full items-stretch justify-center gap-2 sm:gap-3">
       <div
         className="flex w-16 shrink-0 flex-col items-center justify-center sm:w-[4.5rem]"
         style={{ paddingTop: `${(source.row / rows) * 40}%`, paddingBottom: `${((rows - 1 - source.row) / rows) * 40}%` }}
@@ -63,7 +75,7 @@ export function PipeBoard({
           display: 'grid',
           gridTemplateColumns: `repeat(${cols}, 1fr)`,
           gap: '5px',
-          maxWidth: rows >= 5 ? '360px' : '300px',
+          maxWidth,
         }}
       >
         {cells.map((row, r) =>
@@ -72,6 +84,7 @@ export function PipeBoard({
             const onPath = solved && pathKeys.has(k)
             const flow = solved && flowIndex.has(k)
             const hinted = hintKey === k
+            const shaking = shakeKey === k
             return (
               <PipeCell
                 key={k}
@@ -82,6 +95,7 @@ export function PipeBoard({
                 flowing={!!flow}
                 flowDelay={(flowIndex.get(k) ?? 0) * 0.14}
                 clickable={!solved}
+                shaking={shaking}
                 onClick={() => onRotate(r, c)}
               />
             )
@@ -114,6 +128,7 @@ export function PipeBoard({
           <TerminalConnector active={radiatorLit} />
         </motion.div>
       </div>
+    </div>
     </div>
   )
 }

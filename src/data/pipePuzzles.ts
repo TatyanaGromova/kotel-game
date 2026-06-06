@@ -8,6 +8,10 @@ export {
   checkFullySolved,
   findHintCell,
   isRotationCorrect,
+  getSolutionPath,
+  getPathProgress,
+  getConnectionStatus,
+  type ConnectionStatus,
 } from './pipeLogic'
 export { getPipeLevel, PIPE_LEVELS, type PipeLevelConfig } from './pipeLevels'
 

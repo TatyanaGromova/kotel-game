@@ -196,6 +196,56 @@ export function validateLevelDefinition(
   return { ok: errors.length === 0, errors }
 }
 
+export function getSolutionPath(
+  solved: SolvedCellDef[][],
+  source: CellPosition,
+  target: CellPosition
+): CellPosition[] | null {
+  return getConnectedPath(
+    solved.map((row) => row.map((c) => ({ type: c.type, rotation: c.correctRotation }))),
+    source,
+    target
+  )
+}
+
+export function getPathProgress(
+  cells: PipeCellState[][],
+  solved: SolvedCellDef[][],
+  source: CellPosition,
+  target: CellPosition
+): { percent: number; correct: number; total: number } {
+  const path = getSolutionPath(solved, source, target)
+  if (!path || path.length === 0) return { percent: 0, correct: 0, total: 0 }
+
+  let correct = 0
+  for (const pos of path) {
+    const cell = cells[pos.row][pos.col]
+    const def = solved[pos.row][pos.col]
+    if (isRotationCorrect(cell.type, cell.rotation, def.correctRotation)) correct++
+  }
+
+  return {
+    correct,
+    total: path.length,
+    percent: Math.round((correct / path.length) * 100),
+  }
+}
+
+export type ConnectionStatus = 'broken' | 'almost' | 'connected' | 'solved'
+
+export function getConnectionStatus(
+  cells: PipeCellState[][],
+  solved: SolvedCellDef[][],
+  source: CellPosition,
+  target: CellPosition
+): ConnectionStatus {
+  if (checkFullySolved(cells, solved, source, target)) return 'solved'
+  const { percent } = getPathProgress(cells, solved, source, target)
+  if (percent >= 75) return 'almost'
+  if (checkSolved(cells, source, target)) return 'connected'
+  return 'broken'
+}
+
 export function findHintCell(
   cells: PipeCellState[][],
   solved: SolvedCellDef[][],

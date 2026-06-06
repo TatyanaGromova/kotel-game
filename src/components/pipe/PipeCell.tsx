@@ -9,6 +9,7 @@ interface PipeCellProps {
   flowing: boolean
   flowDelay: number
   clickable: boolean
+  shaking?: boolean
   onClick: () => void
 }
 
@@ -132,6 +133,7 @@ export function PipeCell({
   flowing,
   flowDelay,
   clickable,
+  shaking = false,
   onClick,
 }: PipeCellProps) {
   const isInteractive = clickable && type !== 'empty' && type !== 'block'
@@ -145,7 +147,7 @@ export function PipeCell({
         isInteractive ? 'cursor-pointer hover:border-steel-400/60 active:scale-[0.96]' : 'cursor-default'
       } ${onPath ? 'pipe-cell-path' : 'border-steel-700/30 bg-graphite-900/70'} ${
         hinted ? 'pipe-cell-hint' : ''
-      }`}
+      } ${shaking ? 'pipe-cell-shake' : ''}`}
       aria-label={isInteractive ? 'Повернуть трубу' : undefined}
     >
       <motion.div
