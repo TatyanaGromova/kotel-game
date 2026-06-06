@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const LOGO_SRC = `${import.meta.env.BASE_URL}assets/logo/logo-kotel.png?v=5`
+const LOGO_SRC = `${import.meta.env.BASE_URL}assets/logo/logo-kotel.png?v=6`
 
 type LogoSize = 'sm' | 'md' | 'lg' | 'hero'
 
