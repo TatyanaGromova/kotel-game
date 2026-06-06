@@ -270,4 +270,28 @@
   .pipe-terminal-active {
     @apply border-warm-500/40 bg-warm-600/10;
   }
+
+  .pipe-cell-hint {
+    border-color: rgba(255, 200, 100, 0.55) !important;
+    box-shadow: 0 0 0 2px rgba(255, 140, 26, 0.25), inset 0 0 16px rgba(255, 140, 26, 0.15);
+    animation: hint-pulse 1.6s ease-in-out infinite;
+  }
+
+  .hero-panel {
+    @apply glass-panel-strong border-warm-500/15;
+    background: linear-gradient(160deg, rgba(234, 88, 12, 0.08) 0%, rgba(20, 24, 32, 0.92) 55%);
+  }
+
+  .level-card-v2 {
+    @apply glass-panel p-4 transition-shadow;
+  }
+
+  .level-card-v2.level-card-available:hover {
+    box-shadow: 0 0 0 1px rgba(255, 140, 26, 0.2), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  @keyframes hint-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.75; }
+  }
 }

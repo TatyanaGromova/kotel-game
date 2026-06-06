@@ -1,19 +1,19 @@
 import { motion } from 'framer-motion'
-import type { PipeType } from '../../data/pipePuzzles'
+import type { PipeType } from '../../data/pipeLogic'
 
 interface PipeCellProps {
   type: PipeType
   rotation: number
-  connected: boolean
   onPath: boolean
+  hinted: boolean
   flowing: boolean
   flowDelay: number
   clickable: boolean
   onClick: () => void
 }
 
-const PIPE_STROKE = '#5a6d82'
-const PIPE_ACTIVE = '#7a9ab8'
+const PIPE_SHADOW = '#3d4f63'
+const PIPE_BODY = '#8aa4be'
 const FLOW_COLOR = '#ff8c1a'
 
 function PipeShape({
@@ -25,22 +25,40 @@ function PipeShape({
   flowing: boolean
   flowDelay: number
 }) {
-  const sw = 5
+  const sw = 6
   const cap = 'round'
   const center = 50
 
   if (type === 'empty') {
     return (
-      <rect x="20" y="20" width="60" height="60" rx="4" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
+      <rect
+        x="18"
+        y="18"
+        width="64"
+        height="64"
+        rx="6"
+        fill="rgba(255,255,255,0.02)"
+        stroke="rgba(255,255,255,0.06)"
+        strokeWidth="1"
+      />
     )
   }
 
   if (type === 'block') {
     return (
       <>
-        <rect x="18" y="18" width="64" height="64" rx="6" fill="rgba(20,24,30,0.9)" stroke="rgba(80,90,100,0.5)" strokeWidth="1.5" />
-        <line x1="30" y1="30" x2="70" y2="70" stroke="rgba(120,80,70,0.6)" strokeWidth="3" strokeLinecap={cap} />
-        <line x1="70" y1="30" x2="30" y2="70" stroke="rgba(120,80,70,0.6)" strokeWidth="3" strokeLinecap={cap} />
+        <rect
+          x="14"
+          y="14"
+          width="72"
+          height="72"
+          rx="8"
+          fill="rgba(12,14,18,0.95)"
+          stroke="rgba(90,70,60,0.5)"
+          strokeWidth="1.5"
+        />
+        <line x1="28" y1="28" x2="72" y2="72" stroke="rgba(140,90,70,0.55)" strokeWidth="3.5" strokeLinecap={cap} />
+        <line x1="72" y1="28" x2="28" y2="72" stroke="rgba(140,90,70,0.55)" strokeWidth="3.5" strokeLinecap={cap} />
       </>
     )
   }
@@ -64,15 +82,14 @@ function PipeShape({
     <>
       {segments.map((s, i) => (
         <line
-          key={i}
+          key={`sh-${i}`}
           x1={s.x1}
           y1={s.y1}
           x2={s.x2}
           y2={s.y2}
-          stroke={PIPE_STROKE}
-          strokeWidth={sw + 2}
+          stroke={PIPE_SHADOW}
+          strokeWidth={sw + 3}
           strokeLinecap={cap}
-          opacity={0.35}
         />
       ))}
       {segments.map((s, i) => (
@@ -82,10 +99,9 @@ function PipeShape({
           y1={s.y1}
           x2={s.x2}
           y2={s.y2}
-          stroke={PIPE_ACTIVE}
+          stroke={PIPE_BODY}
           strokeWidth={sw}
           strokeLinecap={cap}
-          className="pipe-segment"
         />
       ))}
       {segments.map((s, i) => (
@@ -100,8 +116,8 @@ function PipeShape({
           strokeLinecap={cap}
           initial={{ opacity: 0 }}
           animate={{ opacity: flowing ? 1 : 0 }}
-          transition={{ delay: flowDelay, duration: 0.25 }}
-          style={{ filter: 'drop-shadow(0 0 6px rgba(255,140,26,0.8))' }}
+          transition={{ delay: flowDelay, duration: 0.3 }}
+          style={{ filter: 'drop-shadow(0 0 8px rgba(255,140,26,0.9))' }}
         />
       ))}
     </>
@@ -111,8 +127,8 @@ function PipeShape({
 export function PipeCell({
   type,
   rotation,
-  connected,
   onPath,
+  hinted,
   flowing,
   flowDelay,
   clickable,
@@ -125,17 +141,17 @@ export function PipeCell({
       type="button"
       onClick={isInteractive ? onClick : undefined}
       disabled={!isInteractive}
-      className={`pipe-cell relative aspect-square w-full rounded-lg border transition-colors ${
-        isInteractive ? 'cursor-pointer hover:border-steel-500/50 active:scale-[0.97]' : 'cursor-default'
-      } ${connected ? 'pipe-cell-connected' : 'border-steel-700/25 bg-graphite-900/50'} ${
-        onPath ? 'pipe-cell-path' : ''
+      className={`pipe-cell relative aspect-square w-full rounded-lg border transition-all duration-200 ${
+        isInteractive ? 'cursor-pointer hover:border-steel-400/60 active:scale-[0.96]' : 'cursor-default'
+      } ${onPath ? 'pipe-cell-path' : 'border-steel-700/30 bg-graphite-900/70'} ${
+        hinted ? 'pipe-cell-hint' : ''
       }`}
       aria-label={isInteractive ? 'Повернуть трубу' : undefined}
     >
       <motion.div
-        className="absolute inset-1 flex items-center justify-center"
+        className="absolute inset-0.5 flex items-center justify-center"
         animate={{ rotate: rotation * 90 }}
-        transition={{ type: 'spring', stiffness: 380, damping: 22 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 24 }}
       >
         <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden>
           <PipeShape type={type} flowing={flowing} flowDelay={flowDelay} />
@@ -147,7 +163,7 @@ export function PipeCell({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: flowDelay }}
-          style={{ boxShadow: 'inset 0 0 20px rgba(255,140,26,0.35)' }}
+          style={{ boxShadow: 'inset 0 0 24px rgba(255,140,26,0.4)' }}
         />
       )}
     </button>

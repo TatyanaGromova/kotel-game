@@ -1,5 +1,7 @@
-import { motion } from 'framer-motion'
-import { Play, Sparkles } from 'lucide-react'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Play, HelpCircle, X, MousePointerClick } from 'lucide-react'
+import { KotelLogo } from './KotelLogo'
 import { PipePreview } from './pipe/PipePreview'
 
 interface StartScreenProps {
@@ -7,44 +9,43 @@ interface StartScreenProps {
 }
 
 export function StartScreen({ onStart }: StartScreenProps) {
+  const [showHelp, setShowHelp] = useState(false)
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6 sm:gap-8">
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="relative text-center"
+        className="hero-panel relative overflow-hidden p-6 text-center sm:p-10"
       >
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.15 }}
-          className="mb-3 inline-flex items-center gap-2 rounded-full border border-steel-600/40 bg-graphite-900/60 px-4 py-1 text-xs font-medium uppercase tracking-widest text-steel-400 backdrop-blur-sm"
-        >
-          <Sparkles className="h-3 w-3 text-warm-500" />
-          Сервисный центр «КотёлЪ»
-        </motion.p>
-        <h2 className="heading-hero mx-auto max-w-2xl">КотёлЪ: Трубный маршрут</h2>
-        <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-steel-400 sm:text-lg">
-          Поворачивайте трубы, проведите тепло от котла к радиатору и получите{' '}
-          <span className="text-accent-warm font-semibold">зимний бонус до 2000 ₽</span> на покупку
-          котла, монтаж котла или монтаж системы отопления.
-        </p>
+        <div className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full bg-warm-500/10 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-steel-600/10 blur-3xl" />
+
+        <div className="relative flex flex-col items-center gap-4">
+          <KotelLogo size="hero" showText={false} />
+          <div>
+            <h2 className="heading-hero text-3xl sm:text-4xl">Трубный маршрут</h2>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-steel-400 sm:text-base">
+              Проведите тепло от котла к радиатору и получите{' '}
+              <span className="font-semibold text-warm-400">зимний бонус до 2000 ₽</span>
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.96 }}
+        initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
+        transition={{ delay: 0.15 }}
       >
         <PipePreview />
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.45 }}
-        className="flex flex-col items-center gap-4"
+        transition={{ delay: 0.3 }}
+        className="flex flex-col items-center gap-3"
       >
         <button
           type="button"
@@ -54,10 +55,63 @@ export function StartScreen({ onStart }: StartScreenProps) {
           <Play className="h-5 w-5 transition-transform group-hover:scale-110" />
           Начать игру
         </button>
-        <p className="max-w-xs text-center text-xs leading-relaxed text-gray-500">
-          Кликните по трубе — она повернётся на 90°. Соберите путь — и тепло пойдёт.
-        </p>
+        <button
+          type="button"
+          onClick={() => setShowHelp(true)}
+          className="btn-secondary flex w-full max-w-sm items-center justify-center gap-2 sm:w-auto"
+        >
+          <HelpCircle className="h-4 w-4" />
+          Как играть
+        </button>
       </motion.div>
+
+      <AnimatePresence>
+        {showHelp && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+            onClick={() => setShowHelp(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.92, y: 16 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="glass-panel-strong max-w-md p-6"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="heading-display text-xl">Как играть</h3>
+                <button type="button" onClick={() => setShowHelp(false)} className="btn-ghost p-2">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <ul className="space-y-3 text-sm text-steel-300">
+                <li className="flex gap-3">
+                  <MousePointerClick className="mt-0.5 h-4 w-4 shrink-0 text-warm-500" />
+                  <span>Нажмите на кусочек трубы — он повернётся на 90°.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-warm-500">→</span>
+                  <span>Соедините котёл слева с радиатором справа непрерывным маршрутом.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-warm-500">!</span>
+                  <span>Засоры и пустые клетки не проводят тепло. Лишние трубы могут отвлекать.</span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-warm-500">₽</span>
+                  <span>Пройдите 5 этапов и получите зимний бонус до 2000 ₽.</span>
+                </li>
+              </ul>
+              <button type="button" onClick={() => setShowHelp(false)} className="btn-primary mt-6 w-full">
+                Понятно
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

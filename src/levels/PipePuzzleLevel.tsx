@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
-import { Timer } from 'lucide-react'
+import { Timer, Lightbulb, RotateCcw } from 'lucide-react'
 import { LevelHeader } from '../components/LevelHeader'
 import { HumorBubble } from '../components/HumorBubble'
 import { PipeBoard } from '../components/pipe/PipeBoard'
 import { LEVELS } from '../data/levels'
 import {
   canRotate,
-  cloneGrid,
-  findHeatPath,
-  findReachable,
+  checkFullySolved,
+  cloneCells,
+  findHintCell,
+  getConnectedPath,
   getPipeLevel,
-  type GridCell,
+  type CellPosition,
+  type PipeCellState,
 } from '../data/pipePuzzles'
 import { pickPipeHumor, PIPE_HUMOR } from '../data/humor'
 
@@ -25,17 +27,21 @@ interface PipePuzzleLevelProps {
 export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuzzleLevelProps) {
   const def = getPipeLevel(levelId)
   const meta = LEVELS.find((l) => l.id === levelId)!
-  const [cells, setCells] = useState<GridCell[][]>(() => cloneGrid(def.cells))
-  const [humor, setHumor] = useState<string | null>(null)
+  const [cells, setCells] = useState<PipeCellState[][]>(() => cloneCells(def.initialCells))
+  const [humor, setHumor] = useState<string | null>(levelId === 1 ? PIPE_HUMOR.start : null)
   const [humorVariant, setHumorVariant] = useState<'neutral' | 'success'>('neutral')
   const [hasInteracted, setHasInteracted] = useState(false)
   const [solved, setSolved] = useState(false)
   const [radiatorLit, setRadiatorLit] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(def.timerSec ?? null)
+  const [timeLeft, setTimeLeft] = useState(def.timeLimit ?? null)
   const [timedOut, setTimedOut] = useState(false)
+  const [hintCell, setHintCell] = useState<CellPosition | null>(null)
+  const [hintUsed, setHintUsed] = useState(false)
 
-  const reachable = useMemo(() => findReachable(cells, def.entry), [cells, def.entry])
-  const heatPath = useMemo(() => findHeatPath(cells, def.entry, def.exit), [cells, def.entry, def.exit])
+  const heatPath = useMemo(() => {
+    if (!solved) return null
+    return getConnectedPath(cells, def.source, def.target)
+  }, [cells, def.source, def.target, solved])
 
   const pathKeys = useMemo(() => {
     const set = new Set<string>()
@@ -49,18 +55,23 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
     return map
   }, [heatPath])
 
+  const hintKey = hintCell ? `${hintCell.row},${hintCell.col}` : null
+
   const resetLevel = useCallback(() => {
-    setCells(cloneGrid(def.cells))
+    setCells(cloneCells(def.initialCells))
     setSolved(false)
     setRadiatorLit(false)
-    setHumor(null)
+    setHumor(levelId === 1 ? PIPE_HUMOR.start : null)
+    setHumorVariant('neutral')
     setTimedOut(false)
     setHasInteracted(false)
-    setTimeLeft(def.timerSec ?? null)
-  }, [def])
+    setHintCell(null)
+    setHintUsed(false)
+    setTimeLeft(def.timeLimit ?? null)
+  }, [def, levelId])
 
   useEffect(() => {
-    if (!def.timerSec || solved || timedOut) return
+    if (!def.timeLimit || solved || timedOut) return
     if (timeLeft === null || timeLeft <= 0) return
 
     const id = window.setInterval(() => {
@@ -75,27 +86,30 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
       })
     }, 1000)
     return () => window.clearInterval(id)
-  }, [def.timerSec, solved, timedOut, timeLeft])
+  }, [def.timeLimit, solved, timedOut, timeLeft])
 
   useEffect(() => {
-    if (!hasInteracted || solved || timedOut || !heatPath) return
+    if (!hasInteracted || solved || timedOut) return
+    if (!checkFullySolved(cells, def.solvedCells, def.source, def.target)) return
 
     setSolved(true)
     setRadiatorLit(true)
+    setHintCell(null)
     setHumor(PIPE_HUMOR.flow)
     setHumorVariant('success')
     onHeat(10)
 
     const timer = window.setTimeout(() => onComplete(), 2200)
     return () => window.clearTimeout(timer)
-  }, [heatPath, hasInteracted, solved, timedOut, onComplete, onHeat])
+  }, [cells, hasInteracted, solved, timedOut, def, onComplete, onHeat])
 
   const handleRotate = (row: number, col: number) => {
     if (solved || timedOut) return
-    const cell = cells[row][col]
-    if (!canRotate(cell.type)) return
+    const defCell = def.solvedCells[row][col]
+    if (!canRotate(cells[row][col].type, defCell.locked)) return
 
     setHasInteracted(true)
+    setHintCell(null)
     setCells((prev) =>
       prev.map((r, ri) =>
         r.map((c, ci) =>
@@ -104,33 +118,58 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
       )
     )
 
-    if (Math.random() < 0.35) {
+    if (Math.random() < 0.3) {
       setHumor(pickPipeHumor('rotate'))
       setHumorVariant('neutral')
     }
   }
 
-  const showBlockHumor = cells.some((row) => row.some((c) => c.type === 'block'))
+  const handleHint = () => {
+    if (hintUsed || solved || timedOut) return
+    const hint = findHintCell(cells, def.solvedCells, def.source, def.target)
+    if (!hint) return
+    setHintCell(hint)
+    setHintUsed(true)
+    setHumor('Вот эта труба явно смотрит не туда.')
+    setHumorVariant('neutral')
+  }
+
+  const showBlockHumor = def.solvedCells.some((row) => row.some((c) => c.type === 'block'))
 
   return (
     <div>
       <LevelHeader
         title={meta.title}
-        subtitle={`Уровень ${levelId} · +${meta.reward} ₽`}
+        subtitle={`Этап ${levelId} · +${meta.reward} ₽`}
         onBack={onBack}
         badge="Трубный маршрут"
       />
 
-      {def.timerSec != null && !solved && (
-        <div className="mb-4 flex items-center justify-center gap-2">
+      <div className="mb-4 flex flex-wrap items-center justify-center gap-2">
+        {def.timeLimit != null && !solved && (
           <div
             className={`hud-capsule ${timeLeft !== null && timeLeft <= 15 ? 'border-red-500/40 text-red-300' : ''}`}
           >
             <Timer className="h-4 w-4" />
-            <span className="font-mono font-semibold">{timeLeft ?? def.timerSec} с</span>
+            <span className="font-mono font-semibold">{timeLeft ?? def.timeLimit} с</span>
           </div>
-        </div>
-      )}
+        )}
+        {!solved && !timedOut && (
+          <button
+            type="button"
+            onClick={handleHint}
+            disabled={hintUsed}
+            className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-40"
+          >
+            <Lightbulb className="h-4 w-4" />
+            {hintUsed ? 'Подсказка использована' : 'Подсказка'}
+          </button>
+        )}
+        <button type="button" onClick={resetLevel} className="btn-ghost flex items-center gap-2 text-sm">
+          <RotateCcw className="h-4 w-4" />
+          Сброс
+        </button>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -139,21 +178,18 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
       >
         <PipeBoard
           cells={cells}
-          entry={def.entry}
-          reachable={reachable}
+          source={def.source}
+          target={def.target}
           pathKeys={pathKeys}
           flowIndex={flowIndex}
           solved={solved}
           radiatorLit={radiatorLit}
+          hintKey={hintKey}
           onRotate={handleRotate}
         />
       </motion.div>
 
       {humor && <HumorBubble text={humor} variant={humorVariant} />}
-
-      {!humor && levelId === 1 && (
-        <HumorBubble text={PIPE_HUMOR.start} variant="neutral" />
-      )}
 
       {!humor && showBlockHumor && levelId === 3 && (
         <HumorBubble text={PIPE_HUMOR.block} variant="neutral" />

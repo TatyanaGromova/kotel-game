@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Home, Gift, RotateCcw, Calculator, Flame, Trophy } from 'lucide-react'
 import { BONUS_DISCLAIMER } from '../data/rewards'
+import { KotelLogo } from './KotelLogo'
 
 interface FinalScreenProps {
   readiness: number
@@ -29,13 +30,16 @@ export function FinalScreen({
         <div className="celebration-glow pointer-events-none absolute inset-0 bg-gradient-to-b from-warm-600/15 via-transparent to-transparent" />
         <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-warm-500/10 blur-3xl" />
 
+        <div className="relative mx-auto mb-5 flex justify-center">
+          <KotelLogo size="lg" showText={false} />
+        </div>
         <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', delay: 0.1 }}
-          className="relative mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-warm-500/40 bg-warm-600/20 shadow-warm"
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', delay: 0.15 }}
+          className="relative mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-warm-500/40 bg-warm-600/20"
         >
-          <Trophy className="h-8 w-8 text-warm-400" />
+          <Trophy className="h-6 w-6 text-warm-400" />
         </motion.div>
 
         <h2 className="heading-display relative text-3xl sm:text-4xl">Маршрут тепла собран</h2>

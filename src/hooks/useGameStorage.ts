@@ -33,19 +33,26 @@ const defaultState: GameState = {
   readiness: 0,
 }
 
+interface PersistedState {
+  completedLevels?: number[]
+  heatScore?: number
+}
+
 function loadState(): GameState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return { ...defaultState }
-    const parsed = JSON.parse(raw) as Partial<GameState>
+    const parsed = JSON.parse(raw) as PersistedState
     const completed = parsed.completedLevels ?? []
+    const heatScore = parsed.heatScore ?? 0
     const bonus = calcWinterBonus(completed)
     return {
       ...defaultState,
-      ...parsed,
+      completedLevels: completed,
+      heatScore,
       winterBonus: bonus,
       promoCode: getPromoCode(bonus),
-      readiness: Math.min(100, 40 + completed.length * 10 + (parsed.heatScore ?? 0) / 15),
+      readiness: Math.min(100, 40 + completed.length * 10 + heatScore / 15),
     }
   } catch {
     return { ...defaultState }
@@ -53,7 +60,11 @@ function loadState(): GameState {
 }
 
 function saveState(state: GameState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
+  const payload: PersistedState = {
+    completedLevels: state.completedLevels,
+    heatScore: state.heatScore,
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
 }
 
 export function useGameStorage() {
@@ -87,7 +98,7 @@ export function useGameStorage() {
   const addHeat = useCallback((delta: number) => {
     setState((prev) => {
       const heatScore = Math.max(0, prev.heatScore + delta)
-      const next = {
+      return {
         ...prev,
         heatScore,
         readiness: Math.min(
@@ -95,7 +106,6 @@ export function useGameStorage() {
           Math.round(40 + prev.completedLevels.length * 10 + heatScore / 15)
         ),
       }
-      return next
     })
   }, [])
 

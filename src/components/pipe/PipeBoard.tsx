@@ -1,74 +1,86 @@
 import { motion } from 'framer-motion'
 import { Flame } from 'lucide-react'
-import type { GridCell, Point } from '../../data/pipePuzzles'
+import type { CellPosition, PipeCellState } from '../../data/pipeLogic'
 import { PipeCell } from './PipeCell'
 
 interface PipeBoardProps {
-  cells: GridCell[][]
-  entry: Point
-  reachable: Set<string>
+  cells: PipeCellState[][]
+  source: CellPosition
+  target: CellPosition
   pathKeys: Set<string>
   flowIndex: Map<string, number>
   solved: boolean
   radiatorLit: boolean
+  hintKey: string | null
   onRotate: (row: number, col: number) => void
+}
+
+function TerminalConnector({ active }: { active: boolean }) {
+  return (
+    <div
+      className={`h-2 w-10 rounded-full sm:w-12 ${active ? 'bg-warm-500 shadow-[0_0_12px_rgba(255,140,26,0.6)]' : 'bg-steel-600/40'}`}
+    />
+  )
 }
 
 export function PipeBoard({
   cells,
-  entry,
-  reachable,
+  source,
+  target,
   pathKeys,
   flowIndex,
   solved,
   radiatorLit,
+  hintKey,
   onRotate,
 }: PipeBoardProps) {
   const rows = cells.length
-  const entryRow = entry.row
+  const cols = cells[0].length
 
   return (
-    <div className="flex items-center justify-center gap-2 sm:gap-4">
-      <motion.div
-        className={`pipe-terminal flex shrink-0 flex-col items-center justify-center gap-1 rounded-xl border px-2 py-3 sm:px-3 ${
-          solved ? 'pipe-terminal-active' : ''
-        }`}
-        animate={solved ? { boxShadow: '0 0 24px rgba(255,140,26,0.35)' } : {}}
+    <div className="flex items-stretch justify-center gap-2 sm:gap-3">
+      <div
+        className="flex w-16 shrink-0 flex-col items-center justify-center sm:w-[4.5rem]"
+        style={{ paddingTop: `${(source.row / rows) * 40}%`, paddingBottom: `${((rows - 1 - source.row) / rows) * 40}%` }}
       >
-        <Flame className={`h-6 w-6 sm:h-8 sm:w-8 ${solved ? 'text-warm-400' : 'text-steel-500'}`} />
-        <span className="text-[9px] font-semibold uppercase tracking-wider text-steel-500 sm:text-[10px]">
-          Котёл
-        </span>
-        <div
-          className={`h-1 w-8 rounded-full sm:w-10 ${solved ? 'bg-warm-500' : 'bg-steel-600/50'}`}
-          style={{ marginTop: entryRow === 0 ? 0 : entryRow === rows - 1 ? 'auto' : `${entryRow * 12}%` }}
-        />
-      </motion.div>
+        <motion.div
+          className={`pipe-terminal flex w-full flex-col items-center gap-2 rounded-xl border px-2 py-3 ${
+            solved ? 'pipe-terminal-active' : ''
+          }`}
+          animate={solved ? { boxShadow: '0 0 28px rgba(255,140,26,0.4)' } : {}}
+        >
+          <div className={`rounded-lg p-2 ${solved ? 'bg-warm-600/20' : 'bg-graphite-800/80'}`}>
+            <Flame className={`h-7 w-7 sm:h-8 sm:w-8 ${solved ? 'text-warm-400' : 'text-steel-400'}`} />
+          </div>
+          <span className="text-[9px] font-bold uppercase tracking-wider text-steel-400">Котёл</span>
+          <TerminalConnector active={solved} />
+        </motion.div>
+      </div>
 
       <div
-        className="pipe-grid flex-1 rounded-xl border border-steel-600/30 bg-graphite-950/80 p-1.5 sm:p-2"
+        className="pipe-grid flex-1 rounded-xl border border-steel-500/25 bg-graphite-950/90 p-1.5 sm:p-2"
         style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${cells[0].length}, 1fr)`,
-          gap: '4px',
-          maxWidth: rows === 5 ? '340px' : '280px',
+          gridTemplateColumns: `repeat(${cols}, 1fr)`,
+          gap: '5px',
+          maxWidth: rows >= 5 ? '360px' : '300px',
         }}
       >
         {cells.map((row, r) =>
           row.map((cell, c) => {
             const k = `${r},${c}`
-            const connected = reachable.has(k)
-            const onPath = pathKeys.has(k)
+            const onPath = solved && pathKeys.has(k)
             const flow = solved && flowIndex.has(k)
+            const hinted = hintKey === k
             return (
               <PipeCell
                 key={k}
                 type={cell.type}
                 rotation={cell.rotation}
-                connected={connected}
                 onPath={onPath}
+                hinted={hinted}
                 flowing={!!flow}
-                flowDelay={(flowIndex.get(k) ?? 0) * 0.12}
+                flowDelay={(flowIndex.get(k) ?? 0) * 0.14}
                 clickable={!solved}
                 onClick={() => onRotate(r, c)}
               />
@@ -77,25 +89,31 @@ export function PipeBoard({
         )}
       </div>
 
-      <motion.div
-        className={`pipe-terminal flex shrink-0 flex-col items-center justify-center gap-1 rounded-xl border px-2 py-3 sm:px-3 ${
-          radiatorLit ? 'pipe-terminal-active' : ''
-        }`}
-        animate={radiatorLit ? { boxShadow: '0 0 24px rgba(255,140,26,0.4)' } : {}}
+      <div
+        className="flex w-16 shrink-0 flex-col items-center justify-center sm:w-[4.5rem]"
+        style={{ paddingTop: `${(target.row / rows) * 40}%`, paddingBottom: `${((rows - 1 - target.row) / rows) * 40}%` }}
       >
-        <svg
-          viewBox="0 0 24 24"
-          className={`h-6 w-6 sm:h-8 sm:w-8 ${radiatorLit ? 'text-warm-400' : 'text-steel-500'}`}
-          aria-hidden
+        <motion.div
+          className={`pipe-terminal flex w-full flex-col items-center gap-2 rounded-xl border px-2 py-3 ${
+            radiatorLit ? 'pipe-terminal-active' : ''
+          }`}
+          animate={radiatorLit ? { boxShadow: '0 0 28px rgba(255,140,26,0.45)' } : {}}
         >
-          {[4, 8, 12, 16, 20].map((y) => (
-            <line key={y} x1="5" y1={y} x2="19" y2={y} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-          ))}
-        </svg>
-        <span className="text-[9px] font-semibold uppercase tracking-wider text-steel-500 sm:text-[10px]">
-          Радиатор
-        </span>
-      </motion.div>
+          <div className={`rounded-lg p-2 ${radiatorLit ? 'bg-warm-600/20' : 'bg-graphite-800/80'}`}>
+            <svg
+              viewBox="0 0 24 28"
+              className={`h-7 w-7 sm:h-8 sm:w-8 ${radiatorLit ? 'text-warm-400' : 'text-steel-400'}`}
+              aria-hidden
+            >
+              {[5, 9, 13, 17, 21].map((y) => (
+                <line key={y} x1="4" y1={y} x2="20" y2={y} stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              ))}
+            </svg>
+          </div>
+          <span className="text-[9px] font-bold uppercase tracking-wider text-steel-400">Радиатор</span>
+          <TerminalConnector active={radiatorLit} />
+        </motion.div>
+      </div>
     </div>
   )
 }
