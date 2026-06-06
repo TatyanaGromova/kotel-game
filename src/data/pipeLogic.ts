@@ -145,16 +145,13 @@ export function scrambleSolvedLevel(
   solved: SolvedCellDef[][],
   offsets?: number[][]
 ): PipeCellState[][] {
-  let offsetIndex = 0
-  const flatOffsets = offsets?.flat()
-
-  return solved.map((row) =>
-    row.map((cell) => {
+  return solved.map((row, ri) =>
+    row.map((cell, ci) => {
       if (cell.type === 'empty' || cell.type === 'block' || cell.locked) {
         return { type: cell.type, rotation: cell.rotation }
       }
 
-      const offset = flatOffsets?.[offsetIndex++] ?? pickScrambleOffset(cell)
+      const offset = offsets?.[ri]?.[ci] ?? pickScrambleOffset(cell)
       const rotation = (cell.correctRotation + offset) % 4
 
       return { type: cell.type, rotation }

@@ -105,7 +105,7 @@ const LEVEL_3_INITIAL = scrambleSolvedLevel(LEVEL_3_SOLVED, [
 const LEVEL_4_INITIAL = scrambleSolvedLevel(LEVEL_4_SOLVED, [
   [0, 0, 1, 0, 0],
   [1, 0, 2, 0, 0],
-  [0, 2, 1, 0, 2],
+  [1, 2, 2, 1, 1],
   [2, 0, 0, 0, 1],
   [0, 0, 2, 0, 0],
 ])
