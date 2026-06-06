@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import type { PipeType } from '../../data/pipeLogic'
+import type { PipeSide, PipeType } from '../../data/pipeLogic'
 
 interface PipeCellProps {
   type: PipeType
@@ -10,7 +10,15 @@ interface PipeCellProps {
   flowDelay: number
   clickable: boolean
   shaking?: boolean
+  portSide?: PipeSide
   onClick: () => void
+}
+
+const PORT_CLASS: Record<PipeSide, string> = {
+  0: 'pipe-port-n',
+  1: 'pipe-port-e',
+  2: 'pipe-port-s',
+  3: 'pipe-port-w',
 }
 
 const PIPE_SHADOW = '#3d4f63'
@@ -134,6 +142,7 @@ export function PipeCell({
   flowDelay,
   clickable,
   shaking = false,
+  portSide,
   onClick,
 }: PipeCellProps) {
   const isInteractive = clickable && type !== 'empty' && type !== 'block'
@@ -147,7 +156,7 @@ export function PipeCell({
         isInteractive ? 'cursor-pointer hover:border-steel-400/60 active:scale-[0.96]' : 'cursor-default'
       } ${onPath ? 'pipe-cell-path' : 'border-steel-700/30 bg-graphite-900/70'} ${
         hinted ? 'pipe-cell-hint' : ''
-      } ${shaking ? 'pipe-cell-shake' : ''}`}
+      } ${shaking ? 'pipe-cell-shake' : ''} ${portSide !== undefined ? PORT_CLASS[portSide] : ''}`}
       aria-label={isInteractive ? 'Повернуть трубу' : undefined}
     >
       <motion.div

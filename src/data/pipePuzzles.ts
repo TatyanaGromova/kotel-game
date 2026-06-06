@@ -1,4 +1,12 @@
-export type { PipeType, CellPosition, PipeCellState, SolvedCellDef } from './pipeLogic'
+export type {
+  PipeType,
+  PipeSide,
+  CellPosition,
+  ConnectionPoint,
+  TerminalLayout,
+  PipeCellState,
+  SolvedCellDef,
+} from './pipeLogic'
 export {
   getMask,
   canRotate,
@@ -15,14 +23,13 @@ export {
 } from './pipeLogic'
 export { getPipeLevel, PIPE_LEVELS, type PipeLevelConfig } from './pipeLevels'
 
-import { getConnectedPath, type CellPosition, type PipeCellState } from './pipeLogic'
+import { getConnectedPath, type ConnectionPoint, type PipeCellState } from './pipeLogic'
 
 export type GridCell = PipeCellState
-export type Point = CellPosition
 
 export const cloneGrid = (cells: GridCell[][]) =>
   cells.map((row) => row.map((c) => ({ ...c })))
 
-export function findHeatPath(cells: GridCell[][], entry: Point, exit: Point) {
+export function findHeatPath(cells: GridCell[][], entry: ConnectionPoint, exit: ConnectionPoint) {
   return getConnectedPath(cells, entry, exit)
 }

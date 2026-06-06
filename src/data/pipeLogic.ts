@@ -5,6 +5,20 @@ export interface CellPosition {
   col: number
 }
 
+/** 0=N, 1=E, 2=S, 3=W */
+export type PipeSide = 0 | 1 | 2 | 3
+
+export interface ConnectionPoint {
+  cell: CellPosition
+  side: PipeSide
+}
+
+export interface TerminalLayout {
+  row: number
+}
+
+const SIDE_BIT: Record<PipeSide, number> = { 0: 1, 1: 2, 2: 4, 3: 8 }
+
 export interface PipeCellState {
   type: PipeType
   rotation: number
@@ -62,23 +76,23 @@ function cellKey(r: number, c: number) {
 
 export function getConnectedPath(
   cells: PipeCellState[][],
-  source: CellPosition,
-  target: CellPosition
+  source: ConnectionPoint,
+  target: ConnectionPoint
 ): CellPosition[] | null {
   const rows = cells.length
   const cols = cells[0].length
   const maskAt = (r: number, c: number) => getMask(cells[r][c].type, cells[r][c].rotation)
 
-  if (!(maskAt(source.row, source.col) & 8)) return null
-  if (!(maskAt(target.row, target.col) & 2)) return null
+  if (!(maskAt(source.cell.row, source.cell.col) & SIDE_BIT[source.side])) return null
+  if (!(maskAt(target.cell.row, target.cell.col) & SIDE_BIT[target.side])) return null
 
-  const queue: CellPosition[] = [{ row: source.row, col: source.col }]
+  const queue: CellPosition[] = [{ row: source.cell.row, col: source.cell.col }]
   const parent = new Map<string, string | null>()
-  parent.set(cellKey(source.row, source.col), null)
+  parent.set(cellKey(source.cell.row, source.cell.col), null)
 
   while (queue.length > 0) {
     const cur = queue.shift()!
-    if (cur.row === target.row && cur.col === target.col) {
+    if (cur.row === target.cell.row && cur.col === target.cell.col) {
       const path: CellPosition[] = []
       let k: string | null = cellKey(cur.row, cur.col)
       while (k) {
@@ -111,8 +125,8 @@ export function getConnectedPath(
 
 export function checkSolved(
   cells: PipeCellState[][],
-  source: CellPosition,
-  target: CellPosition
+  source: ConnectionPoint,
+  target: ConnectionPoint
 ): boolean {
   return getConnectedPath(cells, source, target) !== null
 }
@@ -120,8 +134,8 @@ export function checkSolved(
 export function checkFullySolved(
   cells: PipeCellState[][],
   solved: SolvedCellDef[][],
-  source: CellPosition,
-  target: CellPosition
+  source: ConnectionPoint,
+  target: ConnectionPoint
 ): boolean {
   const solutionPath = getConnectedPath(
     solved.map((row) => row.map((c) => ({ type: c.type, rotation: c.correctRotation }))),
@@ -173,8 +187,8 @@ function pickScrambleOffset(cell: SolvedCellDef): number {
 export function validateLevelDefinition(
   solved: SolvedCellDef[][],
   initial: PipeCellState[][],
-  source: CellPosition,
-  target: CellPosition
+  source: ConnectionPoint,
+  target: ConnectionPoint
 ): { ok: boolean; errors: string[] } {
   const errors: string[] = []
   const solvedState = solved.map((row) =>
@@ -198,8 +212,8 @@ export function validateLevelDefinition(
 
 export function getSolutionPath(
   solved: SolvedCellDef[][],
-  source: CellPosition,
-  target: CellPosition
+  source: ConnectionPoint,
+  target: ConnectionPoint
 ): CellPosition[] | null {
   return getConnectedPath(
     solved.map((row) => row.map((c) => ({ type: c.type, rotation: c.correctRotation }))),
@@ -211,8 +225,8 @@ export function getSolutionPath(
 export function getPathProgress(
   cells: PipeCellState[][],
   solved: SolvedCellDef[][],
-  source: CellPosition,
-  target: CellPosition
+  source: ConnectionPoint,
+  target: ConnectionPoint
 ): { percent: number; correct: number; total: number } {
   const path = getSolutionPath(solved, source, target)
   if (!path || path.length === 0) return { percent: 0, correct: 0, total: 0 }
@@ -236,8 +250,8 @@ export type ConnectionStatus = 'broken' | 'almost' | 'connected' | 'solved'
 export function getConnectionStatus(
   cells: PipeCellState[][],
   solved: SolvedCellDef[][],
-  source: CellPosition,
-  target: CellPosition
+  source: ConnectionPoint,
+  target: ConnectionPoint
 ): ConnectionStatus {
   if (checkFullySolved(cells, solved, source, target)) return 'solved'
   const { percent } = getPathProgress(cells, solved, source, target)
@@ -249,8 +263,8 @@ export function getConnectionStatus(
 export function findHintCell(
   cells: PipeCellState[][],
   solved: SolvedCellDef[][],
-  source: CellPosition,
-  target: CellPosition
+  source: ConnectionPoint,
+  target: ConnectionPoint
 ): CellPosition | null {
   const path = getConnectedPath(
     solved.map((row) => row.map((c) => ({ type: c.type, rotation: c.correctRotation }))),

@@ -1,0 +1,40 @@
+import { motion } from 'framer-motion'
+
+interface PipeRadiatorProps {
+  active: boolean
+  flowDelay?: number
+}
+
+export function PipeRadiator({ active, flowDelay = 0 }: PipeRadiatorProps) {
+  return (
+    <motion.div
+      className={`pipe-radiator flex flex-col items-center gap-1.5 rounded-2xl border px-2.5 py-3 sm:px-3 sm:py-3.5 ${
+        active ? 'pipe-radiator-active' : ''
+      }`}
+      animate={active ? { boxShadow: '0 0 28px rgba(255,140,26,0.5)' } : {}}
+      transition={{ delay: flowDelay, duration: 0.35 }}
+    >
+      <div className={`rounded-xl p-2.5 ${active ? 'bg-warm-600/25' : 'bg-graphite-800/90'}`}>
+        <svg
+          viewBox="0 0 24 28"
+          className={`h-8 w-8 sm:h-9 sm:w-9 ${active ? 'text-warm-400' : 'text-steel-400'}`}
+          aria-hidden
+        >
+          {[5, 9, 13, 17, 21].map((y) => (
+            <line key={y} x1="4" y1={y} x2="20" y2={y} stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          ))}
+        </svg>
+      </div>
+      <span className="text-[9px] font-bold uppercase tracking-wider text-steel-400">Радиатор</span>
+      {active && (
+        <motion.div
+          className="h-1 w-8 rounded-full bg-warm-500"
+          initial={{ opacity: 0, scaleX: 0 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ delay: flowDelay, duration: 0.3 }}
+          style={{ boxShadow: '0 0 10px rgba(255,140,26,0.7)' }}
+        />
+      )}
+    </motion.div>
+  )
+}

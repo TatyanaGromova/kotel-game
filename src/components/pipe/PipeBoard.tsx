@@ -1,12 +1,15 @@
-import { motion } from 'framer-motion'
-import { Flame } from 'lucide-react'
-import type { CellPosition, PipeCellState } from '../../data/pipeLogic'
+import type { ConnectionPoint, PipeCellState, PipeSide, TerminalLayout } from '../../data/pipeLogic'
+import { PipeBoiler } from './PipeBoiler'
 import { PipeCell } from './PipeCell'
+import { PipeRadiator } from './PipeRadiator'
+import { PipeStub } from './PipeStub'
 
 interface PipeBoardProps {
   cells: PipeCellState[][]
-  source: CellPosition
-  target: CellPosition
+  sourceConnection: ConnectionPoint
+  targetConnection: ConnectionPoint
+  sourceTerminal: TerminalLayout
+  targetTerminal: TerminalLayout
   pathKeys: Set<string>
   flowIndex: Map<string, number>
   solved: boolean
@@ -17,18 +20,16 @@ interface PipeBoardProps {
   onRotate: (row: number, col: number) => void
 }
 
-function TerminalConnector({ active }: { active: boolean }) {
-  return (
-    <div
-      className={`h-2 w-10 rounded-full sm:w-12 ${active ? 'bg-warm-500 shadow-[0_0_12px_rgba(255,140,26,0.6)]' : 'bg-steel-600/40'}`}
-    />
-  )
+function terminalTop(row: number, rows: number): string {
+  return `${((row + 0.5) / rows) * 100}%`
 }
 
 export function PipeBoard({
   cells,
-  source,
-  target,
+  sourceConnection,
+  targetConnection,
+  sourceTerminal,
+  targetTerminal,
   pathKeys,
   flowIndex,
   solved,
@@ -40,7 +41,17 @@ export function PipeBoard({
 }: PipeBoardProps) {
   const rows = cells.length
   const cols = cells[0].length
-  const maxWidth = cols >= 6 ? '420px' : cols >= 5 ? '360px' : '300px'
+  const maxWidth = cols >= 6 ? 'min(100%, 420px)' : cols >= 5 ? 'min(100%, 360px)' : 'min(100%, 300px)'
+  const pathLen = flowIndex.size
+  const sourceStubDelay = 0.1
+  const gridFlowStart = 0.22
+  const targetStubDelay = gridFlowStart + pathLen * 0.14 + 0.08
+  const radiatorDelay = targetStubDelay + 0.14
+
+  const isEntry = (r: number, c: number) =>
+    r === sourceConnection.cell.row && c === sourceConnection.cell.col
+  const isExit = (r: number, c: number) =>
+    r === targetConnection.cell.row && c === targetConnection.cell.col
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -50,85 +61,93 @@ export function PipeBoard({
           Засор — обходите
         </div>
       )}
-    <div className="flex w-full items-stretch justify-center gap-2 sm:gap-3">
-      <div
-        className="flex w-16 shrink-0 flex-col items-center justify-center sm:w-[4.5rem]"
-        style={{ paddingTop: `${(source.row / rows) * 40}%`, paddingBottom: `${((rows - 1 - source.row) / rows) * 40}%` }}
-      >
-        <motion.div
-          className={`pipe-terminal flex w-full flex-col items-center gap-2 rounded-xl border px-2 py-3 ${
-            solved ? 'pipe-terminal-active' : ''
-          }`}
-          animate={solved ? { boxShadow: '0 0 28px rgba(255,140,26,0.4)' } : {}}
-        >
-          <div className={`rounded-lg p-2 ${solved ? 'bg-warm-600/20' : 'bg-graphite-800/80'}`}>
-            <Flame className={`h-7 w-7 sm:h-8 sm:w-8 ${solved ? 'text-warm-400' : 'text-steel-400'}`} />
-          </div>
-          <span className="text-[9px] font-bold uppercase tracking-wider text-steel-400">Котёл</span>
-          <TerminalConnector active={solved} />
-        </motion.div>
-      </div>
 
       <div
-        className="pipe-grid flex-1 rounded-xl border border-steel-500/25 bg-graphite-950/90 p-1.5 sm:p-2"
-        style={{
-          display: 'grid',
-          gridTemplateColumns: `repeat(${cols}, 1fr)`,
-          gap: '5px',
-          maxWidth,
-        }}
+        className="pipe-board-assembly w-full overflow-x-auto pb-1"
+        style={{ maxWidth: `calc(${maxWidth} + 11rem)` }}
       >
-        {cells.map((row, r) =>
-          row.map((cell, c) => {
-            const k = `${r},${c}`
-            const onPath = solved && pathKeys.has(k)
-            const flow = solved && flowIndex.has(k)
-            const hinted = hintKey === k
-            const shaking = shakeKey === k
-            return (
-              <PipeCell
-                key={k}
-                type={cell.type}
-                rotation={cell.rotation}
-                onPath={onPath}
-                hinted={hinted}
-                flowing={!!flow}
-                flowDelay={(flowIndex.get(k) ?? 0) * 0.14}
-                clickable={!solved}
-                shaking={shaking}
-                onClick={() => onRotate(r, c)}
-              />
-            )
-          })
-        )}
-      </div>
-
-      <div
-        className="flex w-16 shrink-0 flex-col items-center justify-center sm:w-[4.5rem]"
-        style={{ paddingTop: `${(target.row / rows) * 40}%`, paddingBottom: `${((rows - 1 - target.row) / rows) * 40}%` }}
-      >
-        <motion.div
-          className={`pipe-terminal flex w-full flex-col items-center gap-2 rounded-xl border px-2 py-3 ${
-            radiatorLit ? 'pipe-terminal-active' : ''
-          }`}
-          animate={radiatorLit ? { boxShadow: '0 0 28px rgba(255,140,26,0.45)' } : {}}
-        >
-          <div className={`rounded-lg p-2 ${radiatorLit ? 'bg-warm-600/20' : 'bg-graphite-800/80'}`}>
-            <svg
-              viewBox="0 0 24 28"
-              className={`h-7 w-7 sm:h-8 sm:w-8 ${radiatorLit ? 'text-warm-400' : 'text-steel-400'}`}
-              aria-hidden
+        <div className="flex w-full items-stretch justify-center gap-0 sm:gap-0.5">
+          {/* Котёл — вне сетки */}
+          <div className="relative flex w-[4.25rem] shrink-0 flex-col sm:w-[5rem]">
+            <div
+              className="absolute left-0 right-0 flex -translate-y-1/2 justify-center"
+              style={{ top: terminalTop(sourceTerminal.row, rows) }}
             >
-              {[5, 9, 13, 17, 21].map((y) => (
-                <line key={y} x1="4" y1={y} x2="20" y2={y} stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              ))}
-            </svg>
+              <PipeBoiler active={solved} flowDelay={0} />
+            </div>
           </div>
-          <span className="text-[9px] font-bold uppercase tracking-wider text-steel-400">Радиатор</span>
-          <TerminalConnector active={radiatorLit} />
-        </motion.div>
+
+          {/* Патрубок котла */}
+          <div className="relative flex w-5 shrink-0 flex-col sm:w-6">
+            <div
+              className="absolute inset-x-0 flex -translate-y-1/2 items-center"
+              style={{ top: terminalTop(sourceTerminal.row, rows) }}
+            >
+              <PipeStub direction="right" flowing={solved} flowDelay={sourceStubDelay} />
+            </div>
+          </div>
+
+          {/* Только игровая сетка */}
+          <div
+            className="pipe-grid flex-1 rounded-xl border border-steel-500/25 bg-graphite-950/90 p-1.5 sm:p-2"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${cols}, 1fr)`,
+              gap: '5px',
+              maxWidth,
+            }}
+          >
+            {cells.map((row, r) =>
+              row.map((cell, c) => {
+                const k = `${r},${c}`
+                const onPath = solved && pathKeys.has(k)
+                const flow = solved && flowIndex.has(k)
+                const hinted = hintKey === k
+                const shaking = shakeKey === k
+                let portSide: PipeSide | undefined
+                if (isEntry(r, c)) portSide = sourceConnection.side
+                if (isExit(r, c)) portSide = targetConnection.side
+
+                return (
+                  <PipeCell
+                    key={k}
+                    type={cell.type}
+                    rotation={cell.rotation}
+                    onPath={onPath}
+                    hinted={hinted}
+                    flowing={!!flow}
+                    flowDelay={gridFlowStart + (flowIndex.get(k) ?? 0) * 0.14}
+                    clickable={!solved}
+                    shaking={shaking}
+                    portSide={portSide}
+                    onClick={() => onRotate(r, c)}
+                  />
+                )
+              })
+            )}
+          </div>
+
+          {/* Патрубок радиатора */}
+          <div className="relative flex w-5 shrink-0 flex-col sm:w-6">
+            <div
+              className="absolute inset-x-0 flex -translate-y-1/2 items-center"
+              style={{ top: terminalTop(targetTerminal.row, rows) }}
+            >
+              <PipeStub direction="left" flowing={radiatorLit} flowDelay={targetStubDelay} />
+            </div>
+          </div>
+
+          {/* Радиатор — вне сетки */}
+          <div className="relative flex w-[4.25rem] shrink-0 flex-col sm:w-[5rem]">
+            <div
+              className="absolute left-0 right-0 flex -translate-y-1/2 justify-center"
+              style={{ top: terminalTop(targetTerminal.row, rows) }}
+            >
+              <PipeRadiator active={radiatorLit} flowDelay={radiatorDelay} />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
     </div>
   )
 }

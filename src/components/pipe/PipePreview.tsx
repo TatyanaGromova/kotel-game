@@ -1,16 +1,24 @@
 import { motion } from 'framer-motion'
-import { Flame } from 'lucide-react'
+import { PipeBoiler } from './PipeBoiler'
+import { PipeRadiator } from './PipeRadiator'
+import { PipeStub } from './PipeStub'
 
 export function PipePreview() {
   return (
     <div className="scene-frame mx-auto max-w-md p-4 sm:p-6">
-      <div className="flex items-center justify-center gap-3">
-        <div className="flex flex-col items-center gap-1 rounded-lg border border-steel-600/30 bg-graphite-900/60 px-2 py-3">
-          <Flame className="h-6 w-6 text-warm-500" />
-          <span className="text-[9px] uppercase tracking-wider text-steel-500">Котёл</span>
+      <div className="flex items-stretch justify-center gap-0">
+        <div className="relative flex w-14 shrink-0 flex-col">
+          <div className="absolute left-0 right-0 top-1/2 flex -translate-y-1/2 justify-center">
+            <PipeBoiler active />
+          </div>
+        </div>
+        <div className="relative flex w-4 shrink-0 flex-col">
+          <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center">
+            <PipeStub direction="right" flowing />
+          </div>
         </div>
 
-        <div className="grid flex-1 grid-cols-4 gap-1">
+        <div className="grid flex-1 grid-cols-4 gap-1 rounded-lg border border-steel-600/25 bg-graphite-950/80 p-1">
           {[
             'empty',
             'empty',
@@ -77,16 +85,20 @@ export function PipePreview() {
           ))}
         </div>
 
-        <div className="flex flex-col items-center gap-1 rounded-lg border border-warm-500/30 bg-warm-600/10 px-2 py-3 shadow-warm-sm">
-          <svg viewBox="0 0 24 24" className="h-6 w-6 text-warm-400" aria-hidden>
-            {[4, 8, 12, 16, 20].map((y) => (
-              <line key={y} x1="6" y1={y} x2="18" y2={y} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            ))}
-          </svg>
-          <span className="text-[9px] uppercase tracking-wider text-steel-500">Радиатор</span>
+        <div className="relative flex w-4 shrink-0 flex-col">
+          <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 items-center">
+            <PipeStub direction="left" flowing />
+          </div>
+        </div>
+        <div className="relative flex w-14 shrink-0 flex-col">
+          <div className="absolute left-0 right-0 top-1/2 flex -translate-y-1/2 justify-center">
+            <PipeRadiator active />
+          </div>
         </div>
       </div>
-      <p className="mt-4 text-center text-xs text-steel-500">Поверните трубы — проведите оранжевый поток</p>
+      <p className="mt-4 text-center text-xs text-steel-500">
+        Котёл и радиатор снаружи — соберите маршрут в сетке между ними
+      </p>
     </div>
   )
 }

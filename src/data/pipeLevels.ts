@@ -1,7 +1,9 @@
 import {
-  type CellPosition,
+  type ConnectionPoint,
   type PipeCellState,
+  type PipeSide,
   type SolvedCellDef,
+  type TerminalLayout,
   scrambleSolvedLevel,
   validateLevelDefinition,
 } from './pipeLogic'
@@ -14,11 +16,23 @@ export interface PipeLevelConfig {
   gridSize: 4 | 5 | 6
   timeLimit?: number
   maxMoves?: number
-  source: CellPosition
-  target: CellPosition
+  sourceConnection: ConnectionPoint
+  targetConnection: ConnectionPoint
+  sourceTerminal: TerminalLayout
+  targetTerminal: TerminalLayout
   solvedCells: SolvedCellDef[][]
   initialCells: PipeCellState[][]
 }
+
+const SRC = (row: number, col: number, side: PipeSide = 3): ConnectionPoint => ({
+  cell: { row, col },
+  side,
+})
+const TGT = (row: number, col: number, side: PipeSide = 1): ConnectionPoint => ({
+  cell: { row, col },
+  side,
+})
+const TERM = (row: number): TerminalLayout => ({ row })
 
 const X = (): SolvedCellDef => ({ type: 'empty', rotation: 0, correctRotation: 0 })
 const B = (): SolvedCellDef => ({ type: 'block', rotation: 0, correctRotation: 0, locked: true })
@@ -110,8 +124,10 @@ export const PIPE_LEVELS: PipeLevelConfig[] = [
     description: 'Первый изгиб — поверните трубы и найдите маршрут.',
     reward: 300,
     gridSize: 4,
-    source: { row: 1, col: 0 },
-    target: { row: 2, col: 3 },
+    sourceConnection: SRC(1, 0),
+    targetConnection: TGT(2, 3),
+    sourceTerminal: TERM(1),
+    targetTerminal: TERM(2),
     solvedCells: LEVEL_1_SOLVED,
     initialCells: LEVEL_1_INITIAL,
   },
@@ -121,8 +137,10 @@ export const PIPE_LEVELS: PipeLevelConfig[] = [
     description: 'Длинный маршрут с углами и ложными направлениями.',
     reward: 300,
     gridSize: 4,
-    source: { row: 1, col: 0 },
-    target: { row: 3, col: 3 },
+    sourceConnection: SRC(1, 0),
+    targetConnection: TGT(3, 3),
+    sourceTerminal: TERM(1),
+    targetTerminal: TERM(3),
     solvedCells: LEVEL_2_SOLVED,
     initialCells: LEVEL_2_INITIAL,
   },
@@ -132,8 +150,10 @@ export const PIPE_LEVELS: PipeLevelConfig[] = [
     description: 'Два засора и обход сверху — ложная ветка в тупик.',
     reward: 300,
     gridSize: 5,
-    source: { row: 2, col: 0 },
-    target: { row: 2, col: 4 },
+    sourceConnection: SRC(2, 0),
+    targetConnection: TGT(2, 4),
+    sourceTerminal: TERM(2),
+    targetTerminal: TERM(2),
     solvedCells: LEVEL_3_SOLVED,
     initialCells: LEVEL_3_INITIAL,
   },
@@ -144,8 +164,10 @@ export const PIPE_LEVELS: PipeLevelConfig[] = [
     reward: 500,
     gridSize: 5,
     maxMoves: 28,
-    source: { row: 2, col: 0 },
-    target: { row: 4, col: 4 },
+    sourceConnection: SRC(2, 0),
+    targetConnection: TGT(4, 4),
+    sourceTerminal: TERM(2),
+    targetTerminal: TERM(4),
     solvedCells: LEVEL_4_SOLVED,
     initialCells: LEVEL_4_INITIAL,
   },
@@ -157,8 +179,10 @@ export const PIPE_LEVELS: PipeLevelConfig[] = [
     gridSize: 6,
     timeLimit: 60,
     maxMoves: 42,
-    source: { row: 2, col: 0 },
-    target: { row: 5, col: 5 },
+    sourceConnection: SRC(2, 0),
+    targetConnection: TGT(5, 5),
+    sourceTerminal: TERM(2),
+    targetTerminal: TERM(5),
     solvedCells: LEVEL_5_SOLVED,
     initialCells: LEVEL_5_INITIAL,
   },
@@ -169,8 +193,8 @@ if (import.meta.env.DEV) {
     const result = validateLevelDefinition(
       level.solvedCells,
       level.initialCells,
-      level.source,
-      level.target
+      level.sourceConnection,
+      level.targetConnection
     )
     if (!result.ok) {
       console.error(`Pipe level ${level.id} validation failed:`, result.errors)

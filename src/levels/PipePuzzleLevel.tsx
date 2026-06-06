@@ -68,19 +68,19 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
   const showBlockLegend = def.solvedCells.some((row) => row.some((c) => c.type === 'block'))
 
   const connectionStatus = useMemo(
-    () => getConnectionStatus(cells, def.solvedCells, def.source, def.target),
-    [cells, def.solvedCells, def.source, def.target]
+    () => getConnectionStatus(cells, def.solvedCells, def.sourceConnection, def.targetConnection),
+    [cells, def.solvedCells, def.sourceConnection, def.targetConnection]
   )
 
   const progress = useMemo(
-    () => getPathProgress(cells, def.solvedCells, def.source, def.target),
-    [cells, def.solvedCells, def.source, def.target]
+    () => getPathProgress(cells, def.solvedCells, def.sourceConnection, def.targetConnection),
+    [cells, def.solvedCells, def.sourceConnection, def.targetConnection]
   )
 
   const heatPath = useMemo(() => {
     if (!solved) return null
-    return getConnectedPath(cells, def.source, def.target)
-  }, [cells, def.source, def.target, solved])
+    return getConnectedPath(cells, def.sourceConnection, def.targetConnection)
+  }, [cells, def.sourceConnection, def.targetConnection, solved])
 
   const pathKeys = useMemo(() => {
     const set = new Set<string>()
@@ -181,7 +181,7 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
 
   useEffect(() => {
     if (!hasInteracted || solved || failed) return
-    if (!checkFullySolved(cells, def.solvedCells, def.source, def.target)) return
+    if (!checkFullySolved(cells, def.solvedCells, def.sourceConnection, def.targetConnection)) return
 
     setSolved(true)
     setRadiatorLit(true)
@@ -211,7 +211,7 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
     if (!canRotate(cells[row][col].type, defCell.locked)) return
 
     const key = `${row},${col}`
-    const wasConnected = checkSolved(cells, def.source, def.target)
+    const wasConnected = checkSolved(cells, def.sourceConnection, def.targetConnection)
     const prevPercent = progress.percent
 
     setHasInteracted(true)
@@ -241,8 +241,8 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
       nextCells[row][col].rotation,
       defCell.correctRotation
     )
-    const nowConnected = checkSolved(nextCells, def.source, def.target)
-    const nextProgress = getPathProgress(nextCells, def.solvedCells, def.source, def.target)
+    const nowConnected = checkSolved(nextCells, def.sourceConnection, def.targetConnection)
+    const nextProgress = getPathProgress(nextCells, def.solvedCells, def.sourceConnection, def.targetConnection)
 
     const isWrong =
       (onSolutionPath && !nowCorrect) ||
@@ -277,7 +277,7 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
 
   const handleHint = () => {
     if (hintUsed || solved || failed) return
-    const hint = findHintCell(cells, def.solvedCells, def.source, def.target)
+    const hint = findHintCell(cells, def.solvedCells, def.sourceConnection, def.targetConnection)
     if (!hint) return
     const penalty = 5 + Math.floor(Math.random() * 6)
     setHintCell(hint)
@@ -353,8 +353,10 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
       >
         <PipeBoard
           cells={cells}
-          source={def.source}
-          target={def.target}
+          sourceConnection={def.sourceConnection}
+          targetConnection={def.targetConnection}
+          sourceTerminal={def.sourceTerminal}
+          targetTerminal={def.targetTerminal}
           pathKeys={pathKeys}
           flowIndex={flowIndex}
           solved={solved}
