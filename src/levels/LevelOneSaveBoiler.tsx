@@ -1,12 +1,15 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
-import { LEVEL_ONE_QUESTIONS } from '../data/questions'
+import { LEVEL_ONE_QUESTIONS, type ProblemZone } from '../data/questions'
 import { HEAT_CORRECT, HEAT_WRONG } from '../data/rewards'
-import { BoilerScene } from '../components/BoilerScene'
+import { HUMOR, pickZoneWrongHumor } from '../data/humor'
+import { BoilerRoomScene } from '../components/BoilerRoomScene'
+import { BoilerDiagnosticOverlay } from '../components/BoilerDiagnosticOverlay'
 import { ExplosionEffect } from '../components/Effects/ExplosionEffect'
 import { HeatGlowEffect } from '../components/Effects/HeatGlowEffect'
 import { ProgressBar } from '../components/ProgressBar'
+import { LevelHeader } from '../components/LevelHeader'
+import { HumorBubble } from '../components/HumorBubble'
 
 interface Props {
   onComplete: () => void
@@ -16,45 +19,69 @@ interface Props {
 
 export function LevelOneSaveBoiler({ onComplete, onBack, onHeat }: Props) {
   const [step, setStep] = useState(0)
+  const [phase, setPhase] = useState<'zone' | 'action'>('zone')
+  const [zoneOk, setZoneOk] = useState(false)
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [humor, setHumor] = useState<string | null>(null)
   const [shake, setShake] = useState(false)
   const [explosion, setExplosion] = useState(false)
   const [warmGlow, setWarmGlow] = useState(false)
   const [showError, setShowError] = useState(false)
+  const [alert, setAlert] = useState(false)
   const [answered, setAnswered] = useState(false)
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null)
+  const [pickedZone, setPickedZone] = useState<ProblemZone | null>(null)
 
   const q = LEVEL_ONE_QUESTIONS[step]
-  const progress = ((step + (answered ? 1 : 0)) / LEVEL_ONE_QUESTIONS.length) * 100
+  const progress = ((step + (phase === 'action' && answered ? 1 : phase === 'action' ? 0.5 : 0)) / LEVEL_ONE_QUESTIONS.length) * 100
+
+  const pickZone = (zone: ProblemZone) => {
+    if (phase !== 'zone') return
+    setPickedZone(zone)
+    if (zone === q.problemZone) {
+      setZoneOk(true)
+      setHumor(HUMOR.boiler.zoneOk)
+      onHeat(HEAT_CORRECT)
+      setTimeout(() => {
+        setPhase('action')
+        setHumor(null)
+      }, 700)
+    } else {
+      setZoneOk(false)
+      setHumor(pickZoneWrongHumor())
+      onHeat(HEAT_WRONG)
+      setShake(true)
+      setTimeout(() => setShake(false), 400)
+    }
+  }
 
   const handleAnswer = (index: number) => {
-    if (answered) return
+    if (answered || phase !== 'action') return
     setAnswered(true)
+    setSelectedIdx(index)
     const correct = index === q.correctIndex
     const critical = q.criticalWrong?.includes(index)
 
     if (correct) {
       onHeat(HEAT_CORRECT)
       setWarmGlow(true)
+      setAlert(false)
       setFeedback(q.comment)
+      setHumor(HUMOR.boiler.correct)
       setShowError(false)
     } else {
       onHeat(HEAT_WRONG)
-      setFeedback(
-        critical
-          ? `Опасный выбор. ${q.comment}`
-          : `Котёл подаёт сигнал. ${q.comment}`
-      )
-      if (q.effect === 'error' || q.situation.includes('ошибк')) setShowError(true)
+      setFeedback(q.comment)
+      setHumor(critical ? HUMOR.boiler.critical : HUMOR.boiler.wrong)
+      if (q.effect === 'error') setShowError(true)
+      setAlert(true)
       if (critical) {
         setShake(true)
         setExplosion(true)
-        setTimeout(() => {
-          setShake(false)
-          setExplosion(false)
-        }, 800)
+        setTimeout(() => { setShake(false); setExplosion(false) }, 900)
       } else {
         setShake(true)
-        setTimeout(() => setShake(false), 400)
+        setTimeout(() => setShake(false), 450)
       }
     }
   }
@@ -64,77 +91,90 @@ export function LevelOneSaveBoiler({ onComplete, onBack, onHeat }: Props) {
       onComplete()
       return
     }
+    const nextQ = LEVEL_ONE_QUESTIONS[step + 1]
     setStep((s) => s + 1)
+    setPhase('zone')
+    setZoneOk(false)
+    setPickedZone(null)
     setFeedback(null)
+    setHumor(null)
     setAnswered(false)
     setWarmGlow(false)
-    setShowError(q.effect === 'error')
+    setAlert(false)
+    setSelectedIdx(null)
+    setShowError(nextQ?.effect === 'error')
   }
 
   return (
     <div className={shake ? 'screen-shake' : ''}>
-      <button type="button" onClick={onBack} className="mb-4 inline-flex items-center gap-1 text-sm text-gray-400 hover:text-warm-400">
-        <ArrowLeft className="h-4 w-4" /> К уровням
-      </button>
+      <LevelHeader
+        title="Спаси котёл до зимы"
+        subtitle={phase === 'zone' ? 'Нажмите на проблемную зону котла' : 'Выберите правильное действие'}
+        badge="Уровень 1"
+        onBack={onBack}
+      />
 
-      <h2 className="mb-1 text-xl font-bold">Спаси котёл до зимы</h2>
-      <p className="mb-4 text-sm text-gray-400">Интерактивная диагностика</p>
+      <ProgressBar value={progress} label="Диагностика" variant="heat" />
 
-      <ProgressBar value={progress} label="Прогресс уровня" variant="heat" />
-
-      <div className="relative mt-4">
+      <div className="relative mt-5">
         <ExplosionEffect active={explosion} />
-        <HeatGlowEffect active={warmGlow} />
-        <BoilerScene showError={showError || q.effect === 'error'} />
+        <HeatGlowEffect active={warmGlow} className="rounded-2xl" />
+        <BoilerRoomScene
+          showError={showError || q.effect === 'error'}
+          alert={alert && answered && !warmGlow}
+          warm={warmGlow}
+        />
+        <BoilerDiagnosticOverlay
+          activeZone={pickedZone}
+          targetZone={q.problemZone}
+          onSelect={pickZone}
+          disabled={phase !== 'zone'}
+        />
       </div>
 
+      {humor && phase === 'zone' && <HumorBubble text={humor} variant={zoneOk ? 'success' : 'danger'} />}
+
       <AnimatePresence mode="wait">
-        <motion.div
-          key={step}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          className="card-panel relative mt-4 p-4 sm:p-5"
-        >
-          <p className="mb-4 font-medium text-gray-100">{q.situation}</p>
-          <div className="flex flex-col gap-2">
-            {q.options.map((opt, i) => (
-              <button
-                key={opt}
-                type="button"
-                disabled={answered}
-                onClick={() => handleAnswer(i)}
-                className={`option-btn ${
-                  answered
-                    ? i === q.correctIndex
-                      ? 'option-btn-selected border-green-600/50'
-                      : 'opacity-60'
-                    : ''
-                }`}
-              >
-                {opt}
+        {phase === 'action' && (
+          <motion.div
+            key={`${step}-action`}
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-panel-strong relative mt-5 p-5 sm:p-6"
+          >
+            <p className="text-sm text-warm-400/90">{q.symptom}</p>
+            <p className="mt-2 text-lg font-semibold text-gray-50 sm:text-xl">{q.situation}</p>
+            <div className="mt-5 flex flex-col gap-3">
+              {q.options.map((opt, i) => {
+                let cls = 'option-btn'
+                if (answered && i === selectedIdx) {
+                  cls += i === q.correctIndex ? ' option-btn-correct' : ' option-btn-wrong'
+                } else if (answered && i === q.correctIndex) cls += ' option-btn-correct'
+                return (
+                  <motion.button
+                    key={opt}
+                    type="button"
+                    disabled={answered}
+                    onClick={() => handleAnswer(i)}
+                    whileTap={answered ? {} : { scale: 0.98 }}
+                    className={cls}
+                  >
+                    {opt}
+                  </motion.button>
+                )
+              })}
+            </div>
+            {feedback && (
+              <div className={`mt-5 ${warmGlow ? 'feedback-success' : 'feedback-danger'}`}>{feedback}</div>
+            )}
+            {humor && answered && <HumorBubble text={humor} variant={warmGlow ? 'success' : 'danger'} />}
+            {answered && (
+              <button type="button" onClick={next} className="btn-primary mt-5 w-full">
+                {step + 1 >= LEVEL_ONE_QUESTIONS.length ? 'Завершить уровень' : 'Далее'}
               </button>
-            ))}
-          </div>
-
-          {feedback && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className={`mt-4 rounded-lg p-3 text-sm ${
-                warmGlow ? 'bg-green-900/30 text-green-200' : 'bg-red-900/20 text-red-200'
-              }`}
-            >
-              {feedback}
-            </motion.p>
-          )}
-
-          {answered && (
-            <button type="button" onClick={next} className="btn-primary mt-4 w-full">
-              {step + 1 >= LEVEL_ONE_QUESTIONS.length ? 'Завершить уровень' : 'Далее'}
-            </button>
-          )}
-        </motion.div>
+            )}
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   )

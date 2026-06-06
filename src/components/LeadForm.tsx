@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Send, CheckCircle } from 'lucide-react'
+import { Send, CheckCircle, Tag } from 'lucide-react'
 import { SETTLEMENTS } from '../data/settlements'
 import { BONUS_DISCLAIMER } from '../data/rewards'
 
@@ -54,11 +54,13 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="card-panel flex flex-col items-center gap-4 p-8 text-center"
+        className="glass-panel-strong flex flex-col items-center gap-5 p-10 text-center"
       >
-        <CheckCircle className="h-12 w-12 text-green-500" />
-        <h2 className="text-xl font-bold">Заявка подготовлена</h2>
-        <p className="text-gray-400">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full border border-green-500/40 bg-green-950/40 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
+          <CheckCircle className="h-9 w-9 text-green-400" />
+        </div>
+        <h2 className="heading-display text-2xl">Заявка подготовлена</h2>
+        <p className="max-w-sm text-steel-400">
           Мы свяжемся с вами и подскажем условия по зимнему бонусу.
         </p>
         <button type="button" onClick={onBack} className="btn-secondary mt-2">
@@ -70,106 +72,75 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
 
   return (
     <motion.form
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className="card-panel flex flex-col gap-4 p-4 sm:p-6"
+      className="glass-panel-strong flex flex-col gap-5 p-5 sm:p-8"
     >
-      <h2 className="text-xl font-bold">Получить зимний бонус</h2>
+      <div>
+        <h2 className="heading-display text-2xl">Получить зимний бонус</h2>
+        <p className="mt-1 text-sm text-steel-400">Заполните форму — промокод уже подставлен</p>
+      </div>
+
+      <div className="promo-block !p-4 !text-left">
+        <div className="flex items-center gap-2 text-steel-400">
+          <Tag className="h-4 w-4 text-warm-500" />
+          <span className="text-xs uppercase tracking-wider">Ваш промокод</span>
+        </div>
+        <p className="promo-shine mt-1 text-2xl font-black tracking-wider">{form.promo}</p>
+      </div>
 
       <Field label="Имя *" error={errors.name}>
-        <input
-          className="input-field"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="Как к вам обращаться"
-        />
+        <input className="input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Как к вам обращаться" />
       </Field>
 
       <Field label="Телефон *" error={errors.phone}>
-        <input
-          className="input-field"
-          type="tel"
-          value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          placeholder="+7 (___) ___-__-__"
-        />
+        <input className="input-field" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+7 (___) ___-__-__" />
       </Field>
 
       <Field label="Населённый пункт *" error={errors.settlement}>
-        <select
-          className="input-field"
-          value={form.settlement}
-          onChange={(e) => setForm({ ...form, settlement: e.target.value })}
-        >
+        <select className="input-field" value={form.settlement} onChange={(e) => setForm({ ...form, settlement: e.target.value })}>
           <option value="">Выберите...</option>
           {SETTLEMENTS.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
+            <option key={s} value={s}>{s}</option>
           ))}
         </select>
       </Field>
 
       <Field label="Что вас интересует? *" error={errors.interest}>
-        <select
-          className="input-field"
-          value={form.interest}
-          onChange={(e) => setForm({ ...form, interest: e.target.value })}
-        >
+        <select className="input-field" value={form.interest} onChange={(e) => setForm({ ...form, interest: e.target.value })}>
           <option value="">Выберите...</option>
           {INTEREST_OPTIONS.map((o) => (
-            <option key={o} value={o}>
-              {o}
-            </option>
+            <option key={o} value={o}>{o}</option>
           ))}
         </select>
       </Field>
 
       <Field label="Марка котла (если уже выбрали)">
-        <input
-          className="input-field"
-          value={form.boilerBrand}
-          onChange={(e) => setForm({ ...form, boilerBrand: e.target.value })}
-          placeholder="Необязательно"
-        />
+        <input className="input-field" value={form.boilerBrand} onChange={(e) => setForm({ ...form, boilerBrand: e.target.value })} placeholder="Необязательно" />
       </Field>
 
       <Field label="Комментарий">
-        <textarea
-          className="input-field min-h-[80px] resize-y"
-          value={form.comment}
-          onChange={(e) => setForm({ ...form, comment: e.target.value })}
-          placeholder="Дополнительные пожелания"
-        />
+        <textarea className="input-field min-h-[88px] resize-y" value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} placeholder="Дополнительные пожелания" />
       </Field>
 
-      <Field label="Промокод">
-        <input className="input-field bg-graphite-800/80" value={form.promo} readOnly />
-      </Field>
-
-      <label className="flex gap-3 text-sm text-gray-400">
+      <label className="flex gap-3 rounded-xl border border-steel-600/30 bg-graphite-900/50 p-4 text-sm text-steel-400">
         <input
           type="checkbox"
           checked={form.consent}
           onChange={(e) => setForm({ ...form, consent: e.target.checked })}
-          className="mt-1 h-4 w-4 shrink-0 rounded border-graphite-600 accent-warm-500"
+          className="mt-1 h-4 w-4 shrink-0 rounded accent-warm-500"
         />
         <span>
           Я соглашаюсь на{' '}
-          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">
-            обработку персональных данных
-          </a>{' '}
-          и принимаю{' '}
-          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">
-            Политику конфиденциальности
-          </a>
-          .
+          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">обработку персональных данных</a>
+          {' '}и принимаю{' '}
+          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">Политику конфиденциальности</a>.
         </span>
       </label>
       {errors.consent && <p className="text-xs text-red-400">{errors.consent}</p>}
 
-      <p className="text-xs text-gray-500">{BONUS_DISCLAIMER}</p>
+      <p className="text-xs leading-relaxed text-steel-600">{BONUS_DISCLAIMER}</p>
 
       <div className="flex flex-col gap-2 sm:flex-row">
         <button type="submit" className="btn-primary flex flex-1 items-center justify-center gap-2">
@@ -184,18 +155,10 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
   )
 }
 
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string
-  error?: string
-  children: React.ReactNode
-}) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="mb-1 block text-sm text-gray-400">{label}</label>
+      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-steel-500">{label}</label>
       {children}
       {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
     </div>

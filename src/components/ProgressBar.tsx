@@ -5,6 +5,7 @@ interface ProgressBarProps {
   max?: number
   label?: string
   variant?: 'heat' | 'default' | 'cold'
+  urgent?: boolean
 }
 
 export function ProgressBar({
@@ -12,29 +13,30 @@ export function ProgressBar({
   max = 100,
   label,
   variant = 'default',
+  urgent = false,
 }: ProgressBarProps) {
   const pct = Math.min(100, Math.max(0, (value / max) * 100))
-  const barColor =
+  const fillClass =
     variant === 'heat'
-      ? 'bg-gradient-to-r from-warm-600 to-warm-400'
+      ? 'progress-fill-heat'
       : variant === 'cold'
-        ? 'bg-gradient-to-r from-frost-500 to-frost-300'
-        : 'bg-gradient-to-r from-warm-600 to-warm-500'
+        ? 'progress-fill-cold'
+        : 'progress-fill-default'
 
   return (
     <div className="w-full">
       {label && (
-        <div className="mb-1 flex justify-between text-xs text-gray-400">
-          <span>{label}</span>
-          <span>{Math.round(pct)}%</span>
+        <div className="mb-1.5 flex justify-between text-xs">
+          <span className={urgent && pct < 35 ? 'text-red-400/90' : 'text-steel-400'}>{label}</span>
+          <span className="font-mono font-medium text-gray-300">{Math.round(pct)}%</span>
         </div>
       )}
-      <div className="h-2 overflow-hidden rounded-full bg-graphite-800">
+      <div className="progress-track">
         <motion.div
-          className={`h-full rounded-full ${barColor}`}
+          className={fillClass}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         />
       </div>
     </div>

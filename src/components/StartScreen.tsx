@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
-import { Play } from 'lucide-react'
-import { BoilerScene } from './BoilerScene'
+import { Play, Sparkles } from 'lucide-react'
+import { PipePreview } from './pipe/PipePreview'
 
 interface StartScreenProps {
   onStart: () => void
@@ -8,36 +8,54 @@ interface StartScreenProps {
 
 export function StartScreen({ onStart }: StartScreenProps) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center"
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="relative text-center"
       >
-        <p className="mb-2 text-sm font-medium text-warm-500">Сервисный центр «КотёлЪ»</p>
-        <h2 className="text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">
-          КотёлЪ: миссия «Тёплая зима»
-        </h2>
-        <p className="mx-auto mt-4 max-w-lg text-sm text-gray-400 sm:text-base">
-          Пройдите 5 уровней, подготовьте дом к зиме и получите зимний бонус до 2000 ₽ на покупку
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.15 }}
+          className="mb-3 inline-flex items-center gap-2 rounded-full border border-steel-600/40 bg-graphite-900/60 px-4 py-1 text-xs font-medium uppercase tracking-widest text-steel-400 backdrop-blur-sm"
+        >
+          <Sparkles className="h-3 w-3 text-warm-500" />
+          Сервисный центр «КотёлЪ»
+        </motion.p>
+        <h2 className="heading-hero mx-auto max-w-2xl">КотёлЪ: Трубный маршрут</h2>
+        <p className="mx-auto mt-5 max-w-lg text-base leading-relaxed text-steel-400 sm:text-lg">
+          Поворачивайте трубы, проведите тепло от котла к радиатору и получите{' '}
+          <span className="text-accent-warm font-semibold">зимний бонус до 2000 ₽</span> на покупку
           котла, монтаж котла или монтаж системы отопления.
         </p>
       </motion.div>
 
-      <BoilerScene />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        <PipePreview />
+      </motion.div>
 
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="flex flex-col items-center gap-3"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.45 }}
+        className="flex flex-col items-center gap-4"
       >
-        <button type="button" onClick={onStart} className="btn-primary flex items-center justify-center gap-2">
-          <Play className="h-5 w-5" />
+        <button
+          type="button"
+          onClick={onStart}
+          className="btn-primary group flex w-full max-w-sm items-center justify-center gap-3 sm:w-auto"
+        >
+          <Play className="h-5 w-5 transition-transform group-hover:scale-110" />
           Начать игру
         </button>
-        <p className="text-center text-xs text-gray-500">
-          Котёл подаёт сигнал. Лучше разобраться сейчас, чем ждать морозов.
+        <p className="max-w-xs text-center text-xs leading-relaxed text-gray-500">
+          Кликните по трубе — она повернётся на 90°. Соберите путь — и тепло пойдёт.
         </p>
       </motion.div>
     </div>

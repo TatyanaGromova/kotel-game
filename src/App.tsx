@@ -5,11 +5,7 @@ import { LevelSelect } from './components/LevelSelect'
 import { RewardScreen } from './components/RewardScreen'
 import { FinalScreen } from './components/FinalScreen'
 import { LeadForm } from './components/LeadForm'
-import { LevelOneSaveBoiler } from './levels/LevelOneSaveBoiler'
-import { LevelTwoMasterKotel } from './levels/LevelTwoMasterKotel'
-import { LevelThreeNoSurprises } from './levels/LevelThreeNoSurprises'
-import { LevelFourBuildHeating } from './levels/LevelFourBuildHeating'
-import { LevelFiveWinterMode } from './levels/LevelFiveWinterMode'
+import { PipePuzzleLevel } from './levels/PipePuzzleLevel'
 import { LEVELS, getLevelStatus } from './data/levels'
 import { useGameStorage } from './hooks/useGameStorage'
 
@@ -34,25 +30,14 @@ function App() {
   const renderLevel = () => {
     const id = state.currentLevel
     if (!id) return null
-    const props = {
-      onBack: () => update({ screen: 'levels', currentLevel: null }),
-      onHeat: addHeat,
-      onComplete: () => handleLevelComplete(id),
-    }
-    switch (id) {
-      case 1:
-        return <LevelOneSaveBoiler {...props} />
-      case 2:
-        return <LevelTwoMasterKotel {...props} />
-      case 3:
-        return <LevelThreeNoSurprises {...props} />
-      case 4:
-        return <LevelFourBuildHeating {...props} />
-      case 5:
-        return <LevelFiveWinterMode {...props} />
-      default:
-        return null
-    }
+    return (
+      <PipePuzzleLevel
+        levelId={id}
+        onBack={() => update({ screen: 'levels', currentLevel: null })}
+        onHeat={addHeat}
+        onComplete={() => handleLevelComplete(id)}
+      />
+    )
   }
 
   const showHud = state.screen !== 'start'
@@ -76,10 +61,6 @@ function App() {
           onSelectLevel={(id) => {
             const status = getStatus(id)
             if (status === 'locked') return
-            if (status === 'completed') {
-              update({ screen: 'level', currentLevel: id })
-              return
-            }
             update({ screen: 'level', currentLevel: id })
           }}
           allComplete={allComplete}

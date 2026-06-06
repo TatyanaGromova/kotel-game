@@ -1,4 +1,4 @@
-import { Flame, MapPin, AlertTriangle, Wrench, Snowflake } from 'lucide-react'
+import { Circle, CornerDownRight, Ban, Split, Timer } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 export interface LevelMeta {
@@ -12,38 +12,38 @@ export interface LevelMeta {
 export const LEVELS: LevelMeta[] = [
   {
     id: 1,
-    title: 'Спаси котёл до зимы',
-    description: 'Найдите тревожные признаки и выберите правильные действия.',
+    title: 'Первый контур',
+    description: 'Соедините котёл с радиатором — простой маршрут по прямой.',
     reward: 300,
-    icon: Flame,
+    icon: Circle,
   },
   {
     id: 2,
-    title: 'Мастер КотёлЪ',
-    description: 'Решите реальные заявки клиентов из Саткинского района.',
+    title: 'Повороты тепла',
+    description: 'Поворачивайте трубы и соберите маршрут с изгибами.',
     reward: 300,
-    icon: MapPin,
+    icon: CornerDownRight,
   },
   {
     id: 3,
-    title: 'Котёл не любит сюрпризы',
-    description: 'Определите, какие ситуации опасны для котла и отопления.',
+    title: 'Засор на линии',
+    description: 'Обойдите засор — через него поток не проходит.',
     reward: 300,
-    icon: AlertTriangle,
+    icon: Ban,
   },
   {
     id: 4,
-    title: 'Собери отопление',
-    description: 'Соберите правильную систему отопления из важных элементов.',
+    title: 'Ложный маршрут',
+    description: 'Найдите единственный рабочий путь среди лишних веток.',
     reward: 500,
-    icon: Wrench,
+    icon: Split,
   },
   {
     id: 5,
-    title: 'Зимний режим',
-    description: 'Подготовьте дом к морозам и удержите тепло.',
+    title: 'Финальный запуск',
+    description: 'Сложная схема на время — 60 секунд до запуска тепла.',
     reward: 600,
-    icon: Snowflake,
+    icon: Timer,
   },
 ]
 

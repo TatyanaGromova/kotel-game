@@ -1,33 +1,26 @@
-/* Пар */
+/* === Пар === */
 @keyframes steam-rise {
   0% {
     opacity: 0;
-    transform: translateY(0) scaleX(1);
+    transform: translateY(0) scaleX(0.8);
+    filter: blur(8px);
   }
-  20% {
-    opacity: 0.5;
+  15% {
+    opacity: 0.65;
   }
   100% {
     opacity: 0;
-    transform: translateY(-80px) scaleX(1.4);
+    transform: translateY(-100px) scaleX(1.6);
+    filter: blur(14px);
   }
 }
 
 .steam-particle {
-  animation: steam-rise 3s ease-out infinite;
+  animation: steam-rise 4s ease-out infinite;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.35) 0%, transparent 70%);
 }
 
-.steam-particle:nth-child(2) {
-  animation-delay: 0.8s;
-  left: 15%;
-}
-
-.steam-particle:nth-child(3) {
-  animation-delay: 1.6s;
-  left: 70%;
-}
-
-/* Искры */
+/* === Искры === */
 @keyframes spark-fly {
   0% {
     opacity: 1;
@@ -40,108 +33,154 @@
 }
 
 .spark-dot {
-  animation: spark-fly 0.6s ease-out forwards;
+  animation: spark-fly 0.7s ease-out forwards;
+  box-shadow: 0 0 6px rgba(255, 140, 66, 0.9);
 }
 
-/* Дым */
+/* === Дым === */
 @keyframes smoke-drift {
   0% {
-    opacity: 0.6;
+    opacity: 0.7;
     transform: translateY(0) scale(1);
   }
   100% {
     opacity: 0;
-    transform: translateY(-60px) scale(2);
+    transform: translateY(-80px) scale(2.2);
   }
 }
 
 .smoke-cloud {
-  animation: smoke-drift 2.5s ease-out forwards;
+  animation: smoke-drift 3s ease-out forwards;
+  background: radial-gradient(circle, rgba(120, 130, 140, 0.4) 0%, transparent 70%);
 }
 
-/* Иней */
+/* === Иней === */
 @keyframes frost-spread {
   from {
     opacity: 0;
   }
   to {
-    opacity: var(--frost-opacity, 0.7);
+    opacity: var(--frost-opacity, 0.75);
   }
 }
 
 .frost-overlay {
-  animation: frost-spread 1s ease forwards;
-  background: linear-gradient(
-    180deg,
-    rgba(168, 212, 230, 0.15) 0%,
-    rgba(110, 181, 212, 0.08) 50%,
-    transparent 100%
-  );
+  animation: frost-spread 1.2s ease forwards;
+  background:
+    linear-gradient(180deg, rgba(168, 212, 230, 0.2) 0%, rgba(110, 181, 212, 0.06) 40%, transparent 100%),
+    radial-gradient(ellipse at top, rgba(212, 234, 244, 0.15) 0%, transparent 60%);
   pointer-events: none;
 }
 
-/* Тёплое свечение */
+.frost-edge {
+  box-shadow: inset 0 0 60px rgba(168, 212, 230, 0.15), inset 0 0 120px rgba(110, 181, 212, 0.08);
+}
+
+/* === Тёплое свечение === */
 @keyframes warm-pulse {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(234, 88, 12, 0.3);
+    box-shadow:
+      0 0 25px rgba(234, 88, 12, 0.35),
+      0 0 60px rgba(255, 107, 44, 0.15),
+      inset 0 1px 0 rgba(255, 200, 150, 0.1);
   }
   50% {
-    box-shadow: 0 0 40px rgba(255, 140, 66, 0.5);
+    box-shadow:
+      0 0 45px rgba(255, 140, 66, 0.55),
+      0 0 90px rgba(255, 107, 44, 0.25),
+      inset 0 1px 0 rgba(255, 200, 150, 0.15);
   }
 }
 
 .warm-glow-pulse {
-  animation: warm-pulse 2s ease-in-out infinite;
+  animation: warm-pulse 2.5s ease-in-out infinite;
 }
 
-/* Ошибка дисплея */
+@keyframes warm-sweep {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+}
+
+.warm-success-flash {
+  animation: warm-sweep 1.2s ease forwards;
+}
+
+/* === Тревога === */
+@keyframes alert-pulse {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 rgba(220, 38, 38, 0);
+    background-color: rgba(220, 38, 38, 0);
+  }
+  50% {
+    box-shadow: inset 0 0 80px rgba(220, 38, 38, 0.25);
+    background-color: rgba(220, 38, 38, 0.08);
+  }
+}
+
+.alert-pulse-overlay {
+  animation: alert-pulse 1.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
 @keyframes error-blink {
   0%,
-  45%,
+  42%,
   100% {
-    background-color: #1c2229;
+    background-color: #0a0c0e;
     color: #f59e0b;
+    box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
   }
-  50%,
-  55% {
-    background-color: #7f1d1d;
+  48%,
+  52% {
+    background-color: #450a0a;
     color: #fecaca;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
   }
 }
 
 .error-display {
-  animation: error-blink 1s step-end infinite;
+  animation: error-blink 0.9s step-end infinite;
 }
 
-/* Тряска */
+/* === Тряска === */
 @keyframes screen-shake {
   0%,
   100% {
     transform: translateX(0);
   }
-  20% {
+  15% {
+    transform: translateX(-6px) rotate(-0.3deg);
+  }
+  30% {
+    transform: translateX(5px);
+  }
+  45% {
     transform: translateX(-4px);
   }
-  40% {
-    transform: translateX(4px);
-  }
   60% {
-    transform: translateX(-3px);
-  }
-  80% {
-    transform: translateX(3px);
+    transform: translateX(4px);
   }
 }
 
 .screen-shake {
-  animation: screen-shake 0.4s ease-in-out;
+  animation: screen-shake 0.45s ease-in-out;
 }
 
-/* Вспышка */
+/* === Вспышка === */
 @keyframes flash-burst {
   0% {
-    opacity: 0.8;
+    opacity: 0.9;
   }
   100% {
     opacity: 0;
@@ -149,17 +188,45 @@
 }
 
 .explosion-flash {
-  animation: flash-burst 0.5s ease-out forwards;
+  animation: flash-burst 0.55s ease-out forwards;
+  background: radial-gradient(circle, rgba(255, 200, 100, 0.4) 0%, transparent 70%);
 }
 
-/* Индикаторы */
+/* === Маркеры диагностики (уровень 1) === */
+@keyframes diagnostic-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 0.45;
+  }
+}
+
+.diagnostic-marker-dot {
+  background: radial-gradient(circle, #ff8c42 0%, #ea580c 70%);
+  box-shadow: 0 0 12px rgba(234, 88, 12, 0.85), 0 0 24px rgba(255, 140, 66, 0.35);
+  animation: diagnostic-pulse 2s ease-in-out infinite;
+}
+
+.diagnostic-marker-ring {
+  border: 1px solid rgba(234, 88, 12, 0.45);
+  animation: diagnostic-pulse 2s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+/* === Индикаторы === */
 @keyframes indicator-blink {
   0%,
   100% {
     opacity: 1;
+    filter: brightness(1.2);
   }
   50% {
-    opacity: 0.35;
+    opacity: 0.4;
+    filter: brightness(0.8);
   }
 }
 
@@ -167,21 +234,55 @@
   animation: indicator-blink 2s ease-in-out infinite;
 }
 
-/* Трубы — заполнение */
+@keyframes gauge-needle {
+  0%,
+  100% {
+    transform: rotate(-25deg);
+  }
+  50% {
+    transform: rotate(15deg);
+  }
+}
+
+.gauge-needle {
+  transform-origin: bottom center;
+  animation: gauge-needle 4s ease-in-out infinite;
+}
+
+/* === Трубы === */
 @keyframes pipe-fill {
   from {
     width: 0%;
+    opacity: 0.5;
   }
   to {
     width: 100%;
+    opacity: 1;
   }
 }
 
 .pipe-warm-fill {
-  animation: pipe-fill 0.6s ease forwards;
+  animation: pipe-fill 0.8s ease forwards;
+  background: linear-gradient(90deg, #c2410c, #ff8c42, #fbbf24);
+  box-shadow: 0 0 12px rgba(255, 140, 66, 0.5);
 }
 
-/* Промокод */
+@keyframes heat-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.heat-flow-line {
+  background: linear-gradient(90deg, transparent, #ff8c42, #fbbf24, #ff8c42, transparent);
+  background-size: 200% 100%;
+  animation: heat-flow 2s linear infinite;
+}
+
+/* === Промокод === */
 @keyframes promo-shine {
   0% {
     background-position: -200% center;
@@ -195,37 +296,91 @@
   background: linear-gradient(
     90deg,
     #ea580c 0%,
-    #ff8c42 25%,
-    #fbbf24 50%,
-    #ff8c42 75%,
+    #ff8c42 20%,
+    #fde68a 40%,
+    #ff8c42 60%,
     #ea580c 100%
   );
   background-size: 200% auto;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: promo-shine 3s linear infinite;
+  animation: promo-shine 4s linear infinite;
 }
 
-/* Котельная — фон */
+/* === Фон приложения === */
 .boiler-room-bg {
   background:
-    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(234, 88, 12, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(255, 140, 66, 0.08) 0%, transparent 50%),
-    linear-gradient(180deg, #0d0f12 0%, #14181d 40%, #1c2229 100%);
+    radial-gradient(ellipse 100% 60% at 50% 110%, rgba(234, 88, 12, 0.1) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 10% 30%, rgba(90, 109, 130, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 90% 20%, rgba(61, 122, 154, 0.06) 0%, transparent 45%),
+    linear-gradient(180deg, #080a0c 0%, #0f1216 35%, #131820 100%);
 }
 
-/* Окна дома */
+.boiler-room-bg::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  z-index: 0;
+}
+
+/* === Окна === */
 @keyframes window-warm {
   0% {
-    box-shadow: inset 0 0 8px rgba(255, 180, 80, 0.2);
+    box-shadow: inset 0 0 6px rgba(255, 180, 80, 0.15);
+    background: #2a3440;
   }
   100% {
-    box-shadow: inset 0 0 20px rgba(255, 180, 80, 0.7);
+    box-shadow: inset 0 0 24px rgba(255, 200, 120, 0.85), 0 0 20px rgba(255, 140, 66, 0.4);
+    background: linear-gradient(180deg, #fde68a 0%, #ea580c 100%);
   }
 }
 
 .window-lit {
-  animation: window-warm 1.5s ease forwards;
-  background: linear-gradient(180deg, #fbbf24 0%, #ea580c 100%);
+  animation: window-warm 2s ease forwards;
+}
+
+/* === Карта — пульс точки === */
+@keyframes map-ping {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.map-point-ping {
+  animation: map-ping 1.8s ease-out infinite;
+}
+
+@keyframes route-dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* === Hero vignette === */
+.scene-vignette {
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, transparent 30%, rgba(8, 10, 12, 0.75) 100%);
+}
+
+/* === Праздничный финал === */
+@keyframes confetti-glow {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.celebration-glow {
+  animation: confetti-glow 3s ease-in-out infinite;
 }

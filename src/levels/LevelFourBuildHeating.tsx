@@ -1,15 +1,31 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Check } from 'lucide-react'
+import { DndContext, DragOverlay, type DragEndEvent, closestCenter } from '@dnd-kit/core'
 import {
-  HEATING_SEQUENCE,
-  HEATING_ELEMENTS,
-  HEATING_HINTS,
+  HEATING_PIECES,
+  HEATING_SLOTS,
+  ELEMENT_TO_SLOT,
+  DECOY_PIECES,
 } from '../data/questions'
 import { HEAT_CORRECT, HEAT_WRONG } from '../data/rewards'
+import { HUMOR } from '../data/humor'
+import { useDndSensors } from '../hooks/useDndSensors'
+import { PieceDraggable } from '../components/dnd/PieceDraggable'
+import { HeatingPieceIcon } from '../components/illustrations/heatingIcons'
+import { HeatingAssemblyBoard } from '../components/HeatingAssemblyBoard'
 import { ExplosionEffect } from '../components/Effects/ExplosionEffect'
-import { SteamEffect } from '../components/Effects/SteamEffect'
 import { ProgressBar } from '../components/ProgressBar'
+import { LevelHeader } from '../components/LevelHeader'
+import { HumorBubble } from '../components/HumorBubble'
+
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 
 interface Props {
   onComplete: () => void
@@ -18,125 +34,123 @@ interface Props {
 }
 
 export function LevelFourBuildHeating({ onComplete, onBack, onHeat }: Props) {
-  const [built, setBuilt] = useState<string[]>([])
+  const [filled, setFilled] = useState<Record<string, string>>({})
+  const [pool, setPool] = useState(() => shuffle([...HEATING_PIECES]))
   const [feedback, setFeedback] = useState<string | null>(null)
+  const [humor, setHumor] = useState<string | null>(null)
   const [explosion, setExplosion] = useState(false)
-  const [finished, setFinished] = useState(false)
+  const [bounce, setBounce] = useState<string | null>(null)
+  const [activeDrag, setActiveDrag] = useState<string | null>(null)
+  const sensors = useDndSensors()
 
-  const nextExpected = HEATING_SEQUENCE[built.length]
+  const finished = HEATING_SLOTS.every((s) => filled[s.id])
+  const progress = (Object.keys(filled).length / HEATING_SLOTS.length) * 100
 
-  const pick = (el: string) => {
-    if (finished) return
-    if (el === nextExpected) {
-      onHeat(HEAT_CORRECT)
-      const next = [...built, el]
-      setBuilt(next)
-      setFeedback(null)
-      if (next.length >= HEATING_SEQUENCE.length) {
-        setFinished(true)
-      }
-    } else {
+  const onDragEnd = (e: DragEndEvent) => {
+    setActiveDrag(null)
+    const piece = String(e.active.id).replace('piece-', '')
+    const slotId = e.over?.id as string | undefined
+    const validSlot = HEATING_SLOTS.some((s) => s.id === slotId)
+
+    const fail = (msg: string, h: string) => {
       onHeat(HEAT_WRONG)
-      const hint = HEATING_HINTS[el] ?? `Сейчас нужен элемент: «${nextExpected}».`
-      setFeedback(hint)
+      setFeedback(msg)
+      setHumor(h)
       setExplosion(true)
-      setTimeout(() => setExplosion(false), 700)
+      setBounce(piece)
+      setTimeout(() => {
+        setExplosion(false)
+        setBounce(null)
+      }, 700)
     }
+
+    if (!validSlot || !slotId) {
+      fail('Не та зона. Попробуйте другой узел схемы.', HUMOR.heating.wrong)
+      return
+    }
+    if (DECOY_PIECES.includes(piece)) {
+      fail('Эта деталь сюда не входит.', HUMOR.heating.decoy)
+      return
+    }
+    if (ELEMENT_TO_SLOT[piece] !== slotId) {
+      fail('Элемент не подходит к этой зоне.', HUMOR.heating.wrong)
+      return
+    }
+    if (filled[slotId]) {
+      fail('Зона уже занята.', HUMOR.heating.wrong)
+      return
+    }
+
+    onHeat(HEAT_CORRECT)
+    setFilled((f) => ({ ...f, [slotId]: piece }))
+    setPool((p) => p.filter((x) => x !== piece))
+    setFeedback(null)
+    setHumor(HUMOR.heating.snap)
   }
 
-  const progress = (built.length / HEATING_SEQUENCE.length) * 100
+  const activeLabel = activeDrag?.replace('piece-', '') ?? ''
 
   return (
     <div>
-      <button type="button" onClick={onBack} className="mb-4 inline-flex items-center gap-1 text-sm text-gray-400 hover:text-warm-400">
-        <ArrowLeft className="h-4 w-4" /> К уровням
-      </button>
+      <LevelHeader
+        title="Собери отопление"
+        subtitle="Перетащите детали в зоны схемы — порядок не подсказан"
+        badge="Уровень 4"
+        onBack={onBack}
+      />
 
-      <h2 className="text-xl font-bold">Собери отопление</h2>
-      <p className="mb-2 text-sm text-gray-400">
-        Выберите элементы в правильной последовательности ({built.length + 1} из {HEATING_SEQUENCE.length})
-      </p>
+      <ProgressBar value={progress} label="Сборка" variant="heat" />
 
-      <ProgressBar value={progress} label="Сборка системы" variant="heat" />
-
-      <div className="relative mt-4 overflow-hidden rounded-xl border border-graphite-700 bg-graphite-900/60 p-4">
-        <ExplosionEffect active={explosion} />
-        {finished && <SteamEffect />}
-
-        {/* Схема */}
-        <div className="flex min-h-[120px] flex-wrap items-center justify-center gap-2">
-          {HEATING_SEQUENCE.map((el, i) => {
-            const done = built.includes(el)
-            return (
-              <div key={el} className="flex items-center gap-1">
-                <motion.div
-                  animate={done ? { boxShadow: '0 0 20px rgba(234,88,12,0.4)' } : {}}
-                  className={`rounded-lg border px-2 py-1 text-xs sm:text-sm ${
-                    done
-                      ? 'border-warm-500 bg-warm-600/20 text-warm-300'
-                      : i === built.length
-                        ? 'border-warm-500/50 border-dashed text-warm-400'
-                        : 'border-graphite-600 text-gray-600'
-                  }`}
-                >
-                  {done && <Check className="mr-1 inline h-3 w-3" />}
-                  {el}
-                </motion.div>
-                {i < HEATING_SEQUENCE.length - 1 && (
-                  <div className="hidden h-0.5 w-4 overflow-hidden rounded bg-graphite-700 sm:block">
-                    {done && <div className="pipe-warm-fill h-full bg-warm-500" />}
-                  </div>
-                )}
-              </div>
-            )
-          })}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={(e) => setActiveDrag(String(e.active.id))}
+        onDragEnd={onDragEnd}
+      >
+        <div className="relative mt-5">
+          <ExplosionEffect active={explosion} />
+          <HeatingAssemblyBoard filled={filled} finished={finished} />
         </div>
 
-        {finished && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-4 text-center"
-          >
-            <div className="mx-auto mb-2 flex h-16 w-24 gap-1 justify-center">
-              {[0, 1, 2].map((w) => (
-                <div key={w} className="window-lit h-full w-5 rounded-sm" />
+        {!finished && (
+          <div className="mt-5">
+            <p className="mb-3 text-center text-sm text-steel-400">Детали — перетащите на схему</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {pool.map((el) => (
+                <motion.div
+                  key={el}
+                  animate={bounce === el ? { x: [0, -8, 8, -4, 0] } : {}}
+                  transition={{ duration: 0.4 }}
+                >
+                  <PieceDraggable id={`piece-${el}`} label={el} />
+                </motion.div>
               ))}
             </div>
-            <p className="text-sm text-green-200">
-              Система собрана. В реальной жизни монтаж и запуск лучше доверить специалистам.
-            </p>
-          </motion.div>
+          </div>
         )}
-      </div>
 
-      {!finished && (
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {HEATING_ELEMENTS.map((el) => {
-            const used = built.includes(el)
-            return (
-              <button
-                key={el}
-                type="button"
-                disabled={used}
-                onClick={() => pick(el)}
-                className={`option-btn text-sm ${used ? 'opacity-40' : ''}`}
-              >
-                {el}
-              </button>
-            )
-          })}
-        </div>
-      )}
+        <DragOverlay>
+          {activeLabel ? (
+            <div className="flex flex-col items-center rounded-xl border border-warm-500 bg-graphite-800 px-3 py-2 shadow-warm">
+              <HeatingPieceIcon name={activeLabel} size={40} active />
+              <span className="mt-1 text-xs font-semibold">{activeLabel}</span>
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
 
-      {feedback && (
-        <p className="mt-3 rounded-lg bg-red-900/20 p-3 text-sm text-red-200">{feedback}</p>
-      )}
+      {humor && <HumorBubble text={humor} variant={finished ? 'success' : explosion ? 'danger' : 'boiler'} />}
+      {feedback && !finished && <div className="feedback-danger mt-3">{feedback}</div>}
 
       {finished && (
-        <button type="button" onClick={onComplete} className="btn-primary mt-4 w-full">
-          Завершить уровень
-        </button>
+        <>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="feedback-success mt-4 text-center">
+            {HUMOR.heating.complete}
+          </motion.div>
+          <button type="button" onClick={onComplete} className="btn-primary mt-5 w-full">
+            Завершить уровень
+          </button>
+        </>
       )}
     </div>
   )
