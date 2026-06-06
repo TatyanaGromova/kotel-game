@@ -263,6 +263,14 @@
     border-color: rgba(255, 140, 26, 0.35);
   }
 
+  .pipe-board-assembly {
+    @apply w-full max-w-full overflow-visible;
+  }
+
+  .pipe-grid {
+    @apply min-w-0;
+  }
+
   .pipe-boiler,
   .pipe-radiator {
     @apply border-steel-600/35 bg-gradient-to-b from-graphite-900/95 to-graphite-950/90 shadow-lg;

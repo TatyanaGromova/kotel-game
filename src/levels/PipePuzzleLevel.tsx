@@ -349,7 +349,7 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass-panel p-3 sm:p-5"
+        className="glass-panel overflow-visible p-3 sm:p-5"
       >
         <PipeBoard
           cells={cells}

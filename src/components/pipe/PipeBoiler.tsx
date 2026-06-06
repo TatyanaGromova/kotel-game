@@ -4,21 +4,26 @@ import { Flame } from 'lucide-react'
 interface PipeBoilerProps {
   active: boolean
   flowDelay?: number
+  compact?: boolean
 }
 
-export function PipeBoiler({ active, flowDelay = 0 }: PipeBoilerProps) {
+export function PipeBoiler({ active, flowDelay = 0, compact = false }: PipeBoilerProps) {
   return (
     <motion.div
-      className={`pipe-boiler flex flex-col items-center gap-1.5 rounded-2xl border px-2.5 py-3 sm:px-3 sm:py-3.5 ${
-        active ? 'pipe-boiler-active' : ''
-      }`}
+      className={`pipe-boiler flex max-w-full flex-col items-center rounded-2xl border ${
+        compact ? 'gap-1 px-1.5 py-2' : 'gap-1.5 px-2.5 py-3 sm:px-3 sm:py-3.5'
+      } ${active ? 'pipe-boiler-active' : ''}`}
       animate={active ? { boxShadow: '0 0 28px rgba(255,140,26,0.45)' } : {}}
       transition={{ delay: flowDelay, duration: 0.35 }}
     >
-      <div className={`rounded-xl p-2.5 ${active ? 'bg-warm-600/25' : 'bg-graphite-800/90'}`}>
-        <Flame className={`h-8 w-8 sm:h-9 sm:w-9 ${active ? 'text-warm-400' : 'text-steel-400'}`} />
+      <div className={`rounded-xl ${compact ? 'p-1.5' : 'p-2.5'} ${active ? 'bg-warm-600/25' : 'bg-graphite-800/90'}`}>
+        <Flame
+          className={`${compact ? 'h-6 w-6' : 'h-8 w-8 sm:h-9 sm:w-9'} ${active ? 'text-warm-400' : 'text-steel-400'}`}
+        />
       </div>
-      <span className="text-[9px] font-bold uppercase tracking-wider text-steel-400">Котёл</span>
+      <span className={`font-bold uppercase tracking-wider text-steel-400 ${compact ? 'text-[8px]' : 'text-[9px]'}`}>
+        Котёл
+      </span>
       {active && (
         <motion.div
           className="h-1 w-8 rounded-full bg-warm-500"

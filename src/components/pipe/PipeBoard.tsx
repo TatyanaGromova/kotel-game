@@ -24,6 +24,12 @@ function terminalTop(row: number, rows: number): string {
   return `${((row + 0.5) / rows) * 100}%`
 }
 
+function gridMaxClass(cols: number): string {
+  if (cols >= 6) return 'max-w-[min(100%,23rem)]'
+  if (cols >= 5) return 'max-w-[min(100%,20rem)]'
+  return 'max-w-[min(100%,17.5rem)]'
+}
+
 export function PipeBoard({
   cells,
   sourceConnection,
@@ -41,7 +47,6 @@ export function PipeBoard({
 }: PipeBoardProps) {
   const rows = cells.length
   const cols = cells[0].length
-  const maxWidth = cols >= 6 ? 'min(100%, 420px)' : cols >= 5 ? 'min(100%, 360px)' : 'min(100%, 300px)'
   const pathLen = flowIndex.size
   const sourceStubDelay = 0.1
   const gridFlowStart = 0.22
@@ -54,7 +59,7 @@ export function PipeBoard({
     r === targetConnection.cell.row && c === targetConnection.cell.col
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex w-full flex-col items-center gap-2">
       {showBlockLegend && (
         <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-steel-500">
           <span className="inline-block h-3 w-3 rounded border border-steel-600/50 bg-graphite-950" />
@@ -62,23 +67,18 @@ export function PipeBoard({
         </div>
       )}
 
-      <div
-        className="pipe-board-assembly w-full overflow-x-auto pb-1"
-        style={{ maxWidth: `calc(${maxWidth} + 11rem)` }}
-      >
-        <div className="flex w-full items-stretch justify-center gap-0 sm:gap-0.5">
-          {/* Котёл — вне сетки */}
-          <div className="relative flex w-[4.25rem] shrink-0 flex-col sm:w-[5rem]">
+      <div className="pipe-board-assembly mx-auto w-full max-w-full">
+        <div className="flex w-full max-w-full items-stretch justify-center gap-0.5 sm:gap-1">
+          <div className="relative w-[4.5rem] shrink-0 sm:w-[5rem]">
             <div
               className="absolute left-0 right-0 flex -translate-y-1/2 justify-center"
               style={{ top: terminalTop(sourceTerminal.row, rows) }}
             >
-              <PipeBoiler active={solved} flowDelay={0} />
+              <PipeBoiler active={solved} flowDelay={0} compact />
             </div>
           </div>
 
-          {/* Патрубок котла */}
-          <div className="relative flex w-5 shrink-0 flex-col sm:w-6">
+          <div className="relative w-4 shrink-0 sm:w-5">
             <div
               className="absolute inset-x-0 flex -translate-y-1/2 items-center"
               style={{ top: terminalTop(sourceTerminal.row, rows) }}
@@ -87,14 +87,12 @@ export function PipeBoard({
             </div>
           </div>
 
-          {/* Только игровая сетка */}
           <div
-            className="pipe-grid flex-1 rounded-xl border border-steel-500/25 bg-graphite-950/90 p-1.5 sm:p-2"
+            className={`pipe-grid min-w-0 w-full flex-1 rounded-xl border border-steel-500/25 bg-graphite-950/90 p-1.5 sm:p-2 ${gridMaxClass(cols)}`}
             style={{
               display: 'grid',
-              gridTemplateColumns: `repeat(${cols}, 1fr)`,
+              gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
               gap: '5px',
-              maxWidth,
             }}
           >
             {cells.map((row, r) =>
@@ -127,8 +125,7 @@ export function PipeBoard({
             )}
           </div>
 
-          {/* Патрубок радиатора */}
-          <div className="relative flex w-5 shrink-0 flex-col sm:w-6">
+          <div className="relative w-4 shrink-0 sm:w-5">
             <div
               className="absolute inset-x-0 flex -translate-y-1/2 items-center"
               style={{ top: terminalTop(targetTerminal.row, rows) }}
@@ -137,13 +134,12 @@ export function PipeBoard({
             </div>
           </div>
 
-          {/* Радиатор — вне сетки */}
-          <div className="relative flex w-[4.25rem] shrink-0 flex-col sm:w-[5rem]">
+          <div className="relative w-[4.5rem] shrink-0 sm:w-[5rem]">
             <div
               className="absolute left-0 right-0 flex -translate-y-1/2 justify-center"
               style={{ top: terminalTop(targetTerminal.row, rows) }}
             >
-              <PipeRadiator active={radiatorLit} flowDelay={radiatorDelay} />
+              <PipeRadiator active={radiatorLit} flowDelay={radiatorDelay} compact />
             </div>
           </div>
         </div>
