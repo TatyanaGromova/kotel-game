@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Timer, Lightbulb, RotateCcw } from 'lucide-react'
 import { LevelHeader } from '../components/LevelHeader'
@@ -37,6 +37,7 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
   const [timedOut, setTimedOut] = useState(false)
   const [hintCell, setHintCell] = useState<CellPosition | null>(null)
   const [hintUsed, setHintUsed] = useState(false)
+  const completionScheduled = useRef(false)
 
   const heatPath = useMemo(() => {
     if (!solved) return null
@@ -68,6 +69,7 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
     setHintCell(null)
     setHintUsed(false)
     setTimeLeft(def.timeLimit ?? null)
+    completionScheduled.current = false
   }, [def, levelId])
 
   useEffect(() => {
@@ -98,10 +100,15 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
     setHumor(PIPE_HUMOR.flow)
     setHumorVariant('success')
     onHeat(10)
+  }, [cells, hasInteracted, solved, timedOut, def, onHeat])
+
+  useEffect(() => {
+    if (!solved || timedOut || completionScheduled.current) return
+    completionScheduled.current = true
 
     const timer = window.setTimeout(() => onComplete(), 2200)
     return () => window.clearTimeout(timer)
-  }, [cells, hasInteracted, solved, timedOut, def, onComplete, onHeat])
+  }, [solved, timedOut, onComplete])
 
   const handleRotate = (row: number, col: number) => {
     if (solved || timedOut) return
