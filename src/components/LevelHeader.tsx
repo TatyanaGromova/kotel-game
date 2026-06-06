@@ -11,17 +11,17 @@ interface LevelHeaderProps {
 export function LevelHeader({ title, subtitle, onBack, badge, compact = false }: LevelHeaderProps) {
   if (compact) {
     return (
-      <div className="flex shrink-0 items-center gap-1.5">
+      <div className="flex shrink-0 items-center gap-1">
         <button
           type="button"
           onClick={onBack}
-          className="btn-level-ghost !min-h-8 shrink-0 !px-1.5"
+          className="btn-level-ghost !min-h-[34px] shrink-0 !px-1"
           aria-label="К уровням"
         >
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <h2 className="min-w-0 flex-1 truncate font-display text-sm font-bold text-gray-50">{title}</h2>
-        <span className="shrink-0 text-[10px] text-steel-500">{subtitle}</span>
+        <h2 className="pipe-level-title min-w-0 flex-1 truncate font-display font-bold text-gray-50">{title}</h2>
+        <span className="pipe-level-subtitle shrink-0 text-steel-500">{subtitle}</span>
       </div>
     )
   }

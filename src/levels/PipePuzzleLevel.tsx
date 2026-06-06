@@ -302,13 +302,13 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
 
       <div className="pipe-level-hud shrink-0">
         <div className={`pipe-level-hud-capsule ${statusClass(connectionStatus)}`}>
-          <Gauge className="h-3 w-3 shrink-0" />
+          <Gauge className="pipe-level-hud-icon" />
           <span className="font-medium">{statusLabel}</span>
           {progress.percent > 0 && <span className="opacity-70">· {progress.percent}%</span>}
         </div>
 
         <div className="pipe-level-hud-capsule">
-          <Footprints className="h-3 w-3 shrink-0" />
+          <Footprints className="pipe-level-hud-icon" />
           <span className="font-mono font-semibold">
             {moves}
             {def.maxMoves != null && (
@@ -325,7 +325,7 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
               timeLeft !== null && timeLeft <= 15 ? 'border-red-500/40 text-red-300' : ''
             }`}
           >
-            <Timer className="h-3 w-3 shrink-0" />
+            <Timer className="pipe-level-hud-icon" />
             <span className="font-mono font-semibold">{timeLeft ?? def.timeLimit} с</span>
           </div>
         )}
@@ -369,19 +369,19 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
             disabled={hintUsed}
             className="btn-level disabled:opacity-40"
           >
-            <Lightbulb className="h-3.5 w-3.5 shrink-0" />
+            <Lightbulb className="pipe-level-hud-icon" />
             {hintUsed ? 'Подсказка (−)' : 'Подсказка'}
           </button>
         )}
 
         {failed && !solved ? (
           <button type="button" onClick={resetLevel} className="btn-level col-span-2">
-            <RotateCcw className="h-3.5 w-3.5 shrink-0" />
+            <RotateCcw className="pipe-level-hud-icon" />
             Снова
           </button>
         ) : (
           <button type="button" onClick={resetLevel} className="btn-level">
-            <RotateCcw className="h-3.5 w-3.5 shrink-0" />
+            <RotateCcw className="pipe-level-hud-icon" />
             Сброс
           </button>
         )}

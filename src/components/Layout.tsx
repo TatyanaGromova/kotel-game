@@ -33,7 +33,7 @@ export function Layout({
       <header className="z-50 shrink-0 border-b border-white/[0.06] bg-graphite-950/80 backdrop-blur-2xl">
         <div
           className={`mx-auto flex max-w-4xl items-center justify-between gap-2 sm:gap-3 sm:px-4 ${
-            compact ? 'px-2 py-1.5' : 'px-3 py-2 sm:py-3'
+            compact ? 'px-2 py-1' : 'px-3 py-2 sm:py-3'
           }`}
         >
           <div className="layout-header-logo min-w-0">
@@ -61,7 +61,7 @@ export function Layout({
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
           className={
             compact
-              ? 'layout-main mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col px-2 py-1.5'
+              ? 'layout-main mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col px-2 py-1'
               : 'layout-main mx-auto w-full max-w-4xl flex-1 px-3 py-4 pb-8 sm:px-4 sm:py-8'
           }
         >

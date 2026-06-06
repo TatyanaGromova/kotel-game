@@ -21,11 +21,11 @@ export function HumorBubble({ text, variant = 'boiler', compact = false }: Humor
     <motion.div
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`flex shrink-0 gap-1.5 rounded-lg border italic ${
-        compact ? 'px-2 py-1' : 'mt-3 px-3 py-2 text-sm'
+      className={`flex shrink-0 gap-1 rounded-lg border italic ${
+        compact ? 'px-2 py-0.5' : 'mt-3 px-3 py-2 text-sm'
       } ${styles[variant]}`}
     >
-      <MessageCircle className={`shrink-0 opacity-70 ${compact ? 'h-3 w-3' : 'h-4 w-4'}`} />
+      <MessageCircle className={`shrink-0 opacity-70 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
       <span className={compact ? 'humor-bubble-compact' : ''}>«{displayText}»</span>
     </motion.div>
   )

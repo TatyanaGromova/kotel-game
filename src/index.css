@@ -345,7 +345,17 @@
   }
 
   .pipe-level-screen {
-    @apply flex min-h-0 flex-1 flex-col gap-1 overflow-hidden sm:gap-1.5;
+    @apply flex min-h-0 flex-1 flex-col gap-0.5 overflow-hidden sm:gap-1;
+  }
+
+  .pipe-level-title {
+    font-size: clamp(0.9375rem, 4vw, 1.125rem);
+    line-height: 1.15;
+  }
+
+  .pipe-level-subtitle {
+    font-size: clamp(0.75rem, 3.2vw, 0.875rem);
+    line-height: 1.2;
   }
 
   .pipe-level-scene {
@@ -360,23 +370,31 @@
   }
 
   .pipe-level-hud {
-    @apply flex flex-wrap items-center justify-center gap-1 sm:gap-1.5;
+    @apply flex flex-wrap items-center justify-center gap-0.5 sm:gap-1;
   }
 
   .pipe-level-hud-capsule {
+    font-size: clamp(0.8125rem, 3.4vw, 0.875rem);
+    line-height: 1.2;
     @apply inline-flex items-center gap-1 rounded-full border border-white/[0.08]
-      bg-graphite-900/75 px-2 py-0.5 text-[11px] backdrop-blur-md sm:gap-1.5 sm:px-2.5 sm:py-1 sm:text-xs;
+      bg-graphite-900/75 px-1.5 py-px backdrop-blur-md sm:px-2 sm:py-0.5;
+  }
+
+  .pipe-level-hud-icon {
+    @apply h-3.5 w-3.5 shrink-0;
   }
 
   .pipe-level-actions {
-    @apply grid shrink-0 grid-cols-2 gap-1.5 sm:flex sm:flex-wrap sm:justify-center sm:gap-2;
+    @apply grid shrink-0 grid-cols-2 gap-1 sm:flex sm:flex-wrap sm:justify-center sm:gap-1.5;
   }
 
   .btn-level {
-    @apply inline-flex min-h-[40px] items-center justify-center gap-1 rounded-lg border
-      border-steel-600/40 bg-graphite-800/70 px-2.5 py-2 text-xs font-medium text-gray-200
+    font-size: clamp(0.8125rem, 3.3vw, 0.9375rem);
+    line-height: 1.2;
+    @apply inline-flex min-h-[38px] items-center justify-center gap-1 rounded-lg border
+      border-steel-600/40 bg-graphite-800/70 px-2 py-1.5 font-semibold text-gray-200
       touch-manipulation transition-colors hover:border-warm-500/35 hover:text-warm-300
-      active:scale-[0.98] disabled:opacity-40 sm:min-h-[44px] sm:px-3 sm:text-sm;
+      active:scale-[0.98] disabled:opacity-40 sm:min-h-[40px] sm:px-2.5;
   }
 
   .btn-level-ghost {
@@ -384,11 +402,13 @@
   }
 
   .humor-bubble-compact {
-    @apply line-clamp-2 shrink-0 text-[11px] leading-snug sm:text-xs;
+    font-size: clamp(0.8125rem, 3.4vw, 0.875rem);
+    line-height: 1.3;
+    @apply line-clamp-2 shrink-0;
   }
 
-  .layout-compact header {
-    @apply py-1.5;
+  .layout-compact header .mx-auto {
+    @apply py-1;
   }
 
   .layout-compact .layout-header-logo p {

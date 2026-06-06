@@ -5,7 +5,7 @@ export function HeatScore({ score, compact = false }: { score: number; compact?:
   if (compact) {
     return (
       <motion.div layout className="pipe-level-hud-capsule">
-        <Flame className="h-3 w-3 text-warm-500" />
+        <Flame className="pipe-level-hud-icon text-warm-500" />
         <span className="font-semibold text-warm-400">{score}</span>
       </motion.div>
     )
