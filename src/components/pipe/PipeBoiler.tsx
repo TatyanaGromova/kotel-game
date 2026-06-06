@@ -5,9 +5,25 @@ interface PipeBoilerProps {
   active: boolean
   flowDelay?: number
   compact?: boolean
+  mini?: boolean
 }
 
-export function PipeBoiler({ active, flowDelay = 0, compact = false }: PipeBoilerProps) {
+export function PipeBoiler({ active, flowDelay = 0, compact = false, mini = false }: PipeBoilerProps) {
+  if (mini) {
+    return (
+      <motion.div
+        className={`pipe-boiler flex flex-col items-center rounded-lg border px-1 py-1 ${active ? 'pipe-boiler-active' : ''}`}
+        animate={active ? { boxShadow: '0 0 20px rgba(255,140,26,0.45)' } : {}}
+        transition={{ delay: flowDelay, duration: 0.35 }}
+        title="Котёл"
+      >
+        <div className={`rounded-md p-1 ${active ? 'bg-warm-600/25' : 'bg-graphite-800/90'}`}>
+          <Flame className={`h-5 w-5 ${active ? 'text-warm-400' : 'text-steel-400'}`} />
+        </div>
+      </motion.div>
+    )
+  }
+
   return (
     <motion.div
       className={`pipe-boiler flex max-w-full flex-col items-center rounded-2xl border ${

@@ -48,6 +48,7 @@ function App() {
       winterBonus={state.winterBonus}
       onReset={resetProgress}
       showHud={showHud}
+      compact={state.screen === 'level'}
     >
       {state.screen === 'start' && (
         <StartScreen onStart={() => update({ screen: 'levels' })} />

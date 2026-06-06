@@ -292,24 +292,24 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
   const movesRemaining = def.maxMoves != null ? def.maxMoves - moves : null
 
   return (
-    <div>
+    <div className="pipe-level-screen">
       <LevelHeader
+        compact
         title={meta.title}
-        subtitle={`Этап ${levelId} · +${meta.reward} ₽`}
+        subtitle={`Ур. ${levelId} · +${meta.reward} ₽`}
         onBack={onBack}
-        badge="Трубный маршрут"
       />
 
-      <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
-        <div className={`hud-capsule ${statusClass(connectionStatus)}`}>
-          <Gauge className="h-4 w-4" />
-          <span className="text-sm font-medium">{statusLabel}</span>
-          <span className="text-xs opacity-70">· {progress.percent}%</span>
+      <div className="pipe-level-hud shrink-0">
+        <div className={`pipe-level-hud-capsule ${statusClass(connectionStatus)}`}>
+          <Gauge className="h-3 w-3 shrink-0" />
+          <span className="font-medium">{statusLabel}</span>
+          {progress.percent > 0 && <span className="opacity-70">· {progress.percent}%</span>}
         </div>
 
-        <div className="hud-capsule">
-          <Footprints className="h-4 w-4" />
-          <span className="font-mono text-sm font-semibold">
+        <div className="pipe-level-hud-capsule">
+          <Footprints className="h-3 w-3 shrink-0" />
+          <span className="font-mono font-semibold">
             {moves}
             {def.maxMoves != null && (
               <span className={movesRemaining !== null && movesRemaining <= 5 ? 'text-amber-400' : 'text-steel-400'}>
@@ -321,62 +321,71 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
 
         {def.timeLimit != null && !solved && (
           <div
-            className={`hud-capsule ${timeLeft !== null && timeLeft <= 15 ? 'border-red-500/40 text-red-300' : ''}`}
+            className={`pipe-level-hud-capsule ${
+              timeLeft !== null && timeLeft <= 15 ? 'border-red-500/40 text-red-300' : ''
+            }`}
           >
-            <Timer className="h-4 w-4" />
+            <Timer className="h-3 w-3 shrink-0" />
             <span className="font-mono font-semibold">{timeLeft ?? def.timeLimit} с</span>
           </div>
         )}
 
+        <div className="pipe-level-hud-capsule">
+          <span className="text-warm-400">+{meta.reward} ₽</span>
+        </div>
+      </div>
+
+      <div className="pipe-level-scene">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="glass-panel pipe-level-panel"
+        >
+          <PipeBoard
+            cells={cells}
+            sourceConnection={def.sourceConnection}
+            targetConnection={def.targetConnection}
+            sourceTerminal={def.sourceTerminal}
+            targetTerminal={def.targetTerminal}
+            pathKeys={pathKeys}
+            flowIndex={flowIndex}
+            solved={solved}
+            radiatorLit={radiatorLit}
+            hintKey={hintKey}
+            shakeKey={shakeKey}
+            showBlockLegend={showBlockLegend}
+            onRotate={handleRotate}
+          />
+        </motion.div>
+      </div>
+
+      {humor && <HumorBubble compact text={humor} variant={humorVariant} />}
+
+      <div className="pipe-level-actions">
         {!solved && !failed && (
           <button
             type="button"
             onClick={handleHint}
             disabled={hintUsed}
-            className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-40"
+            className="btn-level disabled:opacity-40"
           >
-            <Lightbulb className="h-4 w-4" />
-            {hintUsed ? 'Подсказка (−тепло)' : 'Подсказка'}
+            <Lightbulb className="h-3.5 w-3.5 shrink-0" />
+            {hintUsed ? 'Подсказка (−)' : 'Подсказка'}
           </button>
         )}
 
-        <button type="button" onClick={resetLevel} className="btn-ghost flex items-center gap-2 text-sm">
-          <RotateCcw className="h-4 w-4" />
-          Сброс
-        </button>
-      </div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="glass-panel overflow-visible p-3 sm:p-5"
-      >
-        <PipeBoard
-          cells={cells}
-          sourceConnection={def.sourceConnection}
-          targetConnection={def.targetConnection}
-          sourceTerminal={def.sourceTerminal}
-          targetTerminal={def.targetTerminal}
-          pathKeys={pathKeys}
-          flowIndex={flowIndex}
-          solved={solved}
-          radiatorLit={radiatorLit}
-          hintKey={hintKey}
-          shakeKey={shakeKey}
-          showBlockLegend={showBlockLegend}
-          onRotate={handleRotate}
-        />
-      </motion.div>
-
-      {humor && <HumorBubble text={humor} variant={humorVariant} />}
-
-      {failed && !solved && (
-        <div className="mt-4 flex justify-center">
-          <button type="button" onClick={resetLevel} className="btn-primary">
-            Попробовать снова
+        {failed && !solved ? (
+          <button type="button" onClick={resetLevel} className="btn-level col-span-2">
+            <RotateCcw className="h-3.5 w-3.5 shrink-0" />
+            Снова
           </button>
-        </div>
-      )}
+        ) : (
+          <button type="button" onClick={resetLevel} className="btn-level">
+            <RotateCcw className="h-3.5 w-3.5 shrink-0" />
+            Сброс
+          </button>
+        )}
+      </div>
     </div>
   )
 }

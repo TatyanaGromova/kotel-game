@@ -4,11 +4,16 @@ interface PipeStubProps {
   direction: 'left' | 'right'
   flowing: boolean
   flowDelay?: number
+  narrow?: boolean
 }
 
-export function PipeStub({ direction, flowing, flowDelay = 0 }: PipeStubProps) {
+export function PipeStub({ direction, flowing, flowDelay = 0, narrow = false }: PipeStubProps) {
   return (
-    <div className="pipe-stub relative flex h-3 w-full min-w-[1.25rem] items-center sm:min-w-[1.5rem]">
+    <div
+      className={`pipe-stub relative flex w-full items-center ${
+        narrow ? 'h-2 min-w-[0.375rem]' : 'h-3 min-w-[1.25rem] sm:min-w-[1.5rem]'
+      }`}
+    >
       <div className="absolute inset-y-1/2 h-1.5 w-full -translate-y-1/2 rounded-full bg-steel-700/50" />
       <motion.div
         className={`absolute inset-y-1/2 h-1.5 -translate-y-1/2 rounded-full bg-warm-500 ${

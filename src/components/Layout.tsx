@@ -12,6 +12,7 @@ interface LayoutProps {
   onReset?: () => void
   showHud?: boolean
   shake?: boolean
+  compact?: boolean
 }
 
 export function Layout({
@@ -21,20 +22,29 @@ export function Layout({
   onReset,
   showHud = true,
   shake = false,
+  compact = false,
 }: LayoutProps) {
   return (
-    <div className={`boiler-room-bg relative min-h-screen ${shake ? 'screen-shake' : ''}`}>
-      <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-graphite-950/80 backdrop-blur-2xl">
-        <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
-          <div className="min-w-0">
+    <div
+      className={`boiler-room-bg relative flex flex-col ${shake ? 'screen-shake' : ''} ${
+        compact ? 'layout-compact h-dvh max-h-dvh overflow-hidden' : 'min-h-dvh'
+      }`}
+    >
+      <header className="z-50 shrink-0 border-b border-white/[0.06] bg-graphite-950/80 backdrop-blur-2xl">
+        <div
+          className={`mx-auto flex max-w-4xl items-center justify-between gap-2 sm:gap-3 sm:px-4 ${
+            compact ? 'px-2 py-1.5' : 'px-3 py-2 sm:py-3'
+          }`}
+        >
+          <div className="layout-header-logo min-w-0">
             <KotelLogo size="sm" showText={false} />
             <p className="mt-0.5 truncate text-[10px] font-medium uppercase tracking-[0.18em] text-steel-500">
               Трубный маршрут
             </p>
           </div>
           {showHud && (
-            <div className="flex shrink-0 flex-col items-end gap-1.5 sm:flex-row sm:items-center sm:gap-2">
-              <HeatScore score={heatScore} />
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              <HeatScore score={heatScore} compact={compact} />
               {winterBonus > 0 && <BonusBadge amount={winterBonus} />}
             </div>
           )}
@@ -49,13 +59,17 @@ export function Layout({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className="mx-auto max-w-4xl px-4 py-5 pb-10 sm:py-8"
+          className={
+            compact
+              ? 'layout-main mx-auto flex min-h-0 w-full max-w-4xl flex-1 flex-col px-2 py-1.5'
+              : 'layout-main mx-auto w-full max-w-4xl flex-1 px-3 py-4 pb-8 sm:px-4 sm:py-8'
+          }
         >
           {children}
         </motion.main>
       </AnimatePresence>
 
-      {onReset && (
+      {onReset && !compact && (
         <footer className="mx-auto max-w-4xl px-4 pb-8 text-center">
           <button
             type="button"
