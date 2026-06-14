@@ -3,8 +3,12 @@ import { motion } from 'framer-motion'
 import { Send, CheckCircle, Tag, Banknote, Calendar } from 'lucide-react'
 import { SETTLEMENTS } from '../data/settlements'
 import { BONUS_DISCLAIMER } from '../data/rewards'
+import { PERSONAL_DATA_CONSENT, PRIVACY_POLICY } from '../data/legalTexts'
 import { formatDate } from '../services/promo'
 import { submitLead } from '../services/leads'
+import { LegalModal } from './LegalModal'
+
+type LegalModalType = 'consent' | 'privacy' | null
 
 const INTEREST_OPTIONS = [
   'Покупка котла',
@@ -34,6 +38,7 @@ export function LeadForm({
   const [submitted, setSubmitted] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [legalModal, setLegalModal] = useState<LegalModalType>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [form, setForm] = useState({
     name: '',
@@ -204,13 +209,21 @@ export function LeadForm({
         />
         <span>
           Я соглашаюсь на{' '}
-          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">
+          <button
+            type="button"
+            onClick={() => setLegalModal('consent')}
+            className="inline cursor-pointer border-0 bg-transparent p-0 font-inherit text-warm-400 underline hover:text-warm-300"
+          >
             обработку персональных данных
-          </a>{' '}
+          </button>{' '}
           и принимаю{' '}
-          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">
+          <button
+            type="button"
+            onClick={() => setLegalModal('privacy')}
+            className="inline cursor-pointer border-0 bg-transparent p-0 font-inherit text-warm-400 underline hover:text-warm-300"
+          >
             Политику конфиденциальности
-          </a>
+          </button>
           .
         </span>
       </label>
@@ -237,6 +250,19 @@ export function LeadForm({
           К уровням
         </button>
       </div>
+
+      <LegalModal
+        open={legalModal === 'consent'}
+        title={PERSONAL_DATA_CONSENT.title}
+        paragraphs={PERSONAL_DATA_CONSENT.paragraphs}
+        onClose={() => setLegalModal(null)}
+      />
+      <LegalModal
+        open={legalModal === 'privacy'}
+        title={PRIVACY_POLICY.title}
+        paragraphs={PRIVACY_POLICY.paragraphs}
+        onClose={() => setLegalModal(null)}
+      />
     </motion.form>
   )
 }
