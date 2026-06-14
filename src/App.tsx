@@ -11,6 +11,7 @@ import { LEVELS, getLevelStatus } from './data/levels'
 import { calcWinterBonus } from './data/rewards'
 import { useGameStorage } from './hooks/useGameStorage'
 import { trackEvent } from './services/analytics'
+import { flushPendingQueue } from './services/googleScript'
 import {
   clearPromoClaim,
   ensurePromoClaim,
@@ -36,6 +37,7 @@ function App() {
       currentBonus: state.winterBonus,
       promoCode: activePromo?.promoCode ?? null,
     })
+    void flushPendingQueue()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 

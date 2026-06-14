@@ -1,4 +1,5 @@
 import { getSessionId } from './analytics'
+import { queuePendingLead, sendLeadPayload } from './googleScript'
 
 const LEADS_KEY = 'leads'
 
@@ -19,6 +20,11 @@ export interface LeadRecord extends LeadData {
   sessionId: string
   createdAt: string
   source: string | null
+}
+
+export interface SubmitLeadResult {
+  record: LeadRecord
+  sent: boolean
 }
 
 function getUtmSource(): string | null {
@@ -43,7 +49,18 @@ export function getLeads(): LeadRecord[] {
   }
 }
 
-export function submitLead(leadData: LeadData): LeadRecord {
+function saveLeadLocally(record: LeadRecord): void {
+  const leads = getLeads()
+  if (leads.some((item) => item.leadId === record.leadId)) return
+  leads.push(record)
+  localStorage.setItem(LEADS_KEY, JSON.stringify(leads))
+}
+
+export function persistLead(record: LeadRecord): void {
+  saveLeadLocally(record)
+}
+
+export async function submitLead(leadData: LeadData): Promise<SubmitLeadResult> {
   const record: LeadRecord = {
     leadId: generateLeadId(),
     sessionId: getSessionId(),
@@ -52,13 +69,17 @@ export function submitLead(leadData: LeadData): LeadRecord {
     ...leadData,
   }
 
-  const leads = getLeads()
-  leads.push(record)
-  localStorage.setItem(LEADS_KEY, JSON.stringify(leads))
+  const sent = await sendLeadPayload(record)
 
-  console.log('[Kotel Lead]', record)
+  if (sent) {
+    saveLeadLocally(record)
+    console.log('[Kotel Lead] sent', record)
+  } else {
+    queuePendingLead(record)
+    console.warn('[Kotel Lead] queued for retry', record)
+  }
 
-  return record
+  return { record, sent }
 }
 
 export function clearLeads(): void {
@@ -66,13 +87,12 @@ export function clearLeads(): void {
 }
 
 /**
- * TODO: отправка заявки в личные сообщения ВК.
- * Для отправки заявок в личные сообщения ВК нужен backend/serverless function,
- * где безопасно хранится VK group token.
+ * Отправка заявки во ВК выполняется на стороне Google Apps Script.
+ * Для отправки заявок в личные сообщения ВК нужен backend/serverless function
+ * (или Apps Script), где безопасно хранится VK group token.
  */
 export async function sendLeadToVk(_leadData: LeadRecord): Promise<void> {
-  // TODO: реализовать через backend API
   throw new Error(
-    'sendLeadToVk: для отправки заявок в личные сообщения ВК нужен backend/serverless function, где безопасно хранится VK group token.'
+    'sendLeadToVk: отправка во ВК выполняется через Google Apps Script, VK token не хранится во frontend.'
   )
 }

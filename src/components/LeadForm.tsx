@@ -32,6 +32,8 @@ export function LeadForm({
   onSubmitted,
 }: LeadFormProps) {
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [form, setForm] = useState({
     name: '',
@@ -54,24 +56,38 @@ export function LeadForm({
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = (ev: FormEvent) => {
+  const handleSubmit = async (ev: FormEvent) => {
     ev.preventDefault()
     if (!validate()) return
 
-    submitLead({
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      settlement: form.settlement,
-      interest: form.interest,
-      comment: form.comment.trim(),
-      completedLevels,
-      bonusAmount,
-      promoCode,
-      promoExpiresAt,
-    })
+    setSubmitting(true)
+    setSubmitError(null)
 
-    onSubmitted?.()
-    setSubmitted(true)
+    try {
+      const { sent } = await submitLead({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        settlement: form.settlement,
+        interest: form.interest,
+        comment: form.comment.trim(),
+        completedLevels,
+        bonusAmount,
+        promoCode,
+        promoExpiresAt,
+      })
+
+      if (!sent) {
+        setSubmitError(
+          'Не удалось отправить заявку. Проверьте подключение к интернету и попробуйте ещё раз.'
+        )
+        return
+      }
+
+      onSubmitted?.()
+      setSubmitted(true)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   if (submitted) {
@@ -84,9 +100,9 @@ export function LeadForm({
         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-green-500/40 bg-green-950/40 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
           <CheckCircle className="h-9 w-9 text-green-400" />
         </div>
-        <h2 className="heading-display text-2xl">Заявка сохранена</h2>
+        <h2 className="heading-display text-2xl">Заявка отправлена</h2>
         <p className="max-w-sm text-steel-400">
-          Мы свяжемся с вами и подскажем условия по зимнему бонусу.
+          Мы свяжемся с вами и подскажем условия по бонусу.
         </p>
         <p className="text-sm text-steel-500">
           Промокод <span className="font-semibold text-warm-400">{promoCode}</span> действует до{' '}
@@ -202,10 +218,20 @@ export function LeadForm({
 
       <p className="text-xs leading-relaxed text-steel-600">{BONUS_DISCLAIMER}</p>
 
+      {submitError && (
+        <p className="rounded-lg border border-red-500/30 bg-red-950/20 px-4 py-3 text-sm text-red-200">
+          {submitError}
+        </p>
+      )}
+
       <div className="flex flex-col gap-2 sm:flex-row">
-        <button type="submit" className="btn-primary flex flex-1 items-center justify-center gap-2">
+        <button
+          type="submit"
+          disabled={submitting}
+          className="btn-primary flex flex-1 items-center justify-center gap-2 disabled:opacity-60"
+        >
           <Send className="h-5 w-5" />
-          Отправить заявку
+          {submitting ? 'Отправка…' : 'Отправить заявку'}
         </button>
         <button type="button" onClick={onBack} className="btn-secondary">
           Назад

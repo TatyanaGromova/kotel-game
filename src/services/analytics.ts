@@ -1,3 +1,5 @@
+import { queuePendingEvent, sendGameEvent } from './googleScript'
+
 const SESSION_KEY = 'kotel-session-id'
 const EVENTS_KEY = 'analyticsEvents'
 
@@ -60,6 +62,24 @@ function getUtmSource(): string | null {
   )
 }
 
+function saveEventLocally(event: AnalyticsEvent): void {
+  try {
+    const raw = localStorage.getItem(EVENTS_KEY)
+    const events: AnalyticsEvent[] = raw ? JSON.parse(raw) : []
+    events.push(event)
+    localStorage.setItem(EVENTS_KEY, JSON.stringify(events))
+  } catch {
+    localStorage.setItem(EVENTS_KEY, JSON.stringify([event]))
+  }
+}
+
+async function dispatchEvent(event: AnalyticsEvent): Promise<void> {
+  const sent = await sendGameEvent(event)
+  if (!sent) {
+    queuePendingEvent(event)
+  }
+}
+
 export function trackEvent(eventName: AnalyticsEventName, payload: TrackEventPayload = {}): void {
   const event: AnalyticsEvent = {
     sessionId: getSessionId(),
@@ -73,14 +93,8 @@ export function trackEvent(eventName: AnalyticsEventName, payload: TrackEventPay
     userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
   }
 
-  try {
-    const raw = localStorage.getItem(EVENTS_KEY)
-    const events: AnalyticsEvent[] = raw ? JSON.parse(raw) : []
-    events.push(event)
-    localStorage.setItem(EVENTS_KEY, JSON.stringify(events))
-  } catch {
-    localStorage.setItem(EVENTS_KEY, JSON.stringify([event]))
-  }
+  saveEventLocally(event)
+  void dispatchEvent(event)
 }
 
 export function getAnalyticsEvents(): AnalyticsEvent[] {
