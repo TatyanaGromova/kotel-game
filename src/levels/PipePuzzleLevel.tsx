@@ -335,6 +335,12 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
         </div>
       </div>
 
+      {humor && (
+        <div className="pipe-level-replica">
+          <HumorBubble compact text={humor} variant={humorVariant} />
+        </div>
+      )}
+
       <div className="pipe-level-scene">
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
@@ -358,8 +364,6 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
           />
         </motion.div>
       </div>
-
-      {humor && <HumorBubble compact text={humor} variant={humorVariant} />}
 
       <div className="pipe-level-actions">
         {!solved && !failed && (

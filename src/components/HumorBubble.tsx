@@ -15,18 +15,20 @@ export function HumorBubble({ text, variant = 'boiler', compact = false }: Humor
     danger: 'border-red-500/30 bg-red-950/30 text-red-200/90',
   }
 
-  const displayText = compact && text.length > 72 ? `${text.slice(0, 70)}…` : text
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`flex shrink-0 gap-1 rounded-lg border italic ${
-        compact ? 'px-2 py-0.5' : 'mt-3 px-3 py-2 text-sm'
+      className={`flex gap-1.5 border italic ${
+        compact
+          ? 'humor-bubble-compact-wrap w-full items-start rounded-lg px-2 py-1'
+          : 'mt-3 shrink-0 rounded-lg px-3 py-2 text-sm'
       } ${styles[variant]}`}
     >
-      <MessageCircle className={`shrink-0 opacity-70 ${compact ? 'h-3.5 w-3.5' : 'h-4 w-4'}`} />
-      <span className={compact ? 'humor-bubble-compact' : ''}>«{displayText}»</span>
+      <MessageCircle
+        className={`shrink-0 opacity-70 ${compact ? 'mt-0.5 h-3.5 w-3.5' : 'h-4 w-4'}`}
+      />
+      <span className={compact ? 'humor-bubble-compact min-w-0 flex-1' : ''}>«{text}»</span>
     </motion.div>
   )
 }
