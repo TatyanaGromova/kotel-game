@@ -109,7 +109,7 @@ export function LeadForm({
           {formatDate(promoExpiresAt)}
         </p>
         <button type="button" onClick={onBack} className="btn-secondary mt-2">
-          Вернуться к игре
+          К уровням
         </button>
       </motion.div>
     )
@@ -234,7 +234,7 @@ export function LeadForm({
           {submitting ? 'Отправка…' : 'Отправить заявку'}
         </button>
         <button type="button" onClick={onBack} className="btn-secondary">
-          Назад
+          К уровням
         </button>
       </div>
     </motion.form>

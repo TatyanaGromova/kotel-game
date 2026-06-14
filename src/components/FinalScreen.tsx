@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Home, Gift, RotateCcw, Calculator, Flame, Trophy, Calendar, AlertCircle } from 'lucide-react'
+import { Home, Gift, RotateCcw, Flame, Trophy, Calendar, AlertCircle } from 'lucide-react'
 import { BONUS_DISCLAIMER } from '../data/rewards'
 import { formatDate, getPromoClaim, isPromoExpired } from '../services/promo'
 import { KotelLogo } from './KotelLogo'
@@ -117,33 +117,13 @@ export function FinalScreen({
         ) : (
           <button type="button" onClick={onGetBonus} className="btn-primary flex w-full items-center justify-center gap-2">
             <Gift className="h-5 w-5" />
-            {promoCode ? 'Оформить заявку' : `Забрать ${winterBonus} ₽`}
+            Оставить заявку с промокодом
           </button>
         )}
-        <div className="grid gap-3 sm:grid-cols-3">
-          <a
-            href="https://kotel.ru"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary flex items-center justify-center gap-2"
-          >
-            <Calculator className="h-4 w-4" />
-            Рассчитать монтаж
-          </a>
-          <a
-            href="https://kotel.ru"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-secondary flex items-center justify-center gap-2"
-          >
-            <Flame className="h-4 w-4" />
-            Подобрать котёл
-          </a>
-          <button type="button" onClick={onRestart} className="btn-secondary flex items-center justify-center gap-2">
-            <RotateCcw className="h-4 w-4" />
-            Пройти заново
-          </button>
-        </div>
+        <button type="button" onClick={onRestart} className="btn-secondary flex w-full items-center justify-center gap-2">
+          <RotateCcw className="h-4 w-4" />
+          Пройти заново
+        </button>
       </div>
     </motion.div>
   )
