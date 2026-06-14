@@ -335,17 +335,19 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
         </div>
       </div>
 
-      {humor && (
-        <div className="pipe-level-replica">
-          <HumorBubble compact text={humor} variant={humorVariant} />
-        </div>
-      )}
-
       <div className="pipe-level-scene">
+        <div className="pipe-level-replica-zone">
+          {humor && (
+            <div className="pipe-level-replica">
+              <HumorBubble compact text={humor} variant={humorVariant} />
+            </div>
+          )}
+        </div>
+
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="glass-panel pipe-level-panel"
+          className="glass-panel pipe-level-panel shrink-0"
         >
           <PipeBoard
             cells={cells}
@@ -363,6 +365,8 @@ export function PipePuzzleLevel({ levelId, onBack, onHeat, onComplete }: PipePuz
             onRotate={handleRotate}
           />
         </motion.div>
+
+        <div className="pipe-level-scene-spacer" aria-hidden="true" />
       </div>
 
       <div className="pipe-level-actions">
