@@ -12,6 +12,7 @@ interface LevelSelectProps {
   getStatus: (id: number) => 'locked' | 'available' | 'completed'
   onSelectLevel: (id: number) => void
   onFinal?: () => void
+  onClaimBonus?: () => void
   allComplete: boolean
 }
 
@@ -21,6 +22,7 @@ export function LevelSelect({
   getStatus,
   onSelectLevel,
   onFinal,
+  onClaimBonus,
   allComplete,
 }: LevelSelectProps) {
   return (
@@ -67,6 +69,18 @@ export function LevelSelect({
           </motion.div>
         ))}
       </div>
+
+      {winterBonus > 0 && onClaimBonus && (
+        <motion.button
+          type="button"
+          onClick={onClaimBonus}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="btn-secondary w-full"
+        >
+          Забрать {winterBonus} ₽
+        </motion.button>
+      )}
 
       {allComplete && onFinal && (
         <motion.button

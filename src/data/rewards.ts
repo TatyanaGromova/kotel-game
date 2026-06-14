@@ -8,19 +8,18 @@ export const LEVEL_REWARDS: Record<number, number> = {
   5: 600,
 }
 
+/** Накопленный бонус по количеству пройденных уровней: 300 / 600 / 900 / 1400 / 2000 */
+export const BONUS_BY_LEVEL_COUNT: Record<number, number> = {
+  1: 300,
+  2: 600,
+  3: 900,
+  4: 1400,
+  5: 2000,
+}
+
 export const HEAT_CORRECT = 10
 export const HEAT_WRONG = -5
 export const HEAT_LEVEL_COMPLETE = 20
-
-export function getPromoCode(bonus: number): string {
-  const capped = Math.min(bonus, MAX_WINTER_BONUS)
-  if (capped >= 2000) return 'ТЕПЛО2000'
-  if (capped >= 1400) return 'ТЕПЛО1400'
-  if (capped >= 900) return 'ТЕПЛО900'
-  if (capped >= 600) return 'ТЕПЛО600'
-  if (capped >= 300) return 'ТЕПЛО300'
-  return 'ТЕПЛО0'
-}
 
 export function calcWinterBonus(completedLevels: number[]): number {
   return Math.min(

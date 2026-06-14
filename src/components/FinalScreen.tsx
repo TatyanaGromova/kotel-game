@@ -1,25 +1,30 @@
 import { motion } from 'framer-motion'
-import { Home, Gift, RotateCcw, Calculator, Flame, Trophy } from 'lucide-react'
+import { Home, Gift, RotateCcw, Calculator, Flame, Trophy, Calendar, AlertCircle } from 'lucide-react'
 import { BONUS_DISCLAIMER } from '../data/rewards'
+import { formatDate, getPromoClaim, isPromoExpired } from '../services/promo'
 import { KotelLogo } from './KotelLogo'
 
 interface FinalScreenProps {
   readiness: number
   heatScore: number
   winterBonus: number
-  promoCode: string
   onGetBonus: () => void
   onRestart: () => void
+  onRenewBonus: () => void
 }
 
 export function FinalScreen({
   readiness,
   heatScore,
   winterBonus,
-  promoCode,
   onGetBonus,
   onRestart,
+  onRenewBonus,
 }: FinalScreenProps) {
+  const claim = getPromoClaim()
+  const promoExpired = claim ? isPromoExpired(claim.expiresAt) : false
+  const promoCode = claim && !promoExpired ? claim.promoCode : null
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -70,28 +75,67 @@ export function FinalScreen({
         <div className="promo-block relative mx-auto mt-8 max-w-md">
           <p className="text-xs uppercase tracking-[0.2em] text-steel-400">Ваш зимний бонус</p>
           <p className="mt-2 text-4xl font-black text-warm-300 sm:text-5xl">{winterBonus} ₽</p>
-          <div className="my-4 h-px bg-gradient-to-r from-transparent via-warm-500/40 to-transparent" />
-          <p className="text-sm text-steel-400">Промокод</p>
-          <p className="promo-shine mt-1 text-3xl font-black tracking-[0.15em] sm:text-4xl">{promoCode}</p>
+
+          {promoExpired && claim && (
+            <div className="mt-4 rounded-xl border border-red-500/30 bg-red-950/20 p-4 text-left">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+                <div>
+                  <p className="text-sm text-red-200">
+                    Срок действия промокода истёк. Пройдите игру заново, чтобы получить новый бонус.
+                  </p>
+                  <p className="mt-1 text-xs text-steel-500">
+                    Истёк: {formatDate(claim.expiresAt)} · {claim.promoCode}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {promoCode && (
+            <>
+              <div className="my-4 h-px bg-gradient-to-r from-transparent via-warm-500/40 to-transparent" />
+              <p className="text-sm text-steel-400">Персональный промокод</p>
+              <p className="promo-shine mt-1 text-2xl font-black tracking-[0.1em] sm:text-3xl">{promoCode}</p>
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-steel-500">
+                <Calendar className="h-3.5 w-3.5" />
+                Промокод действует до: {formatDate(claim!.expiresAt)}
+              </p>
+            </>
+          )}
         </div>
 
-        <p className="relative mt-6 text-xs leading-relaxed text-steel-500">
-          Зимний бонус действует только на покупку котла, монтаж котла и монтаж системы отопления.
-        </p>
-        <p className="relative mt-2 text-xs leading-relaxed text-steel-600">{BONUS_DISCLAIMER}</p>
+        <p className="relative mt-6 text-xs leading-relaxed text-steel-600">{BONUS_DISCLAIMER}</p>
       </div>
 
       <div className="flex flex-col gap-3">
-        <button type="button" onClick={onGetBonus} className="btn-primary flex w-full items-center justify-center gap-2">
-          <Gift className="h-5 w-5" />
-          Получить бонус
-        </button>
+        {promoExpired ? (
+          <button type="button" onClick={onRenewBonus} className="btn-primary flex w-full items-center justify-center gap-2">
+            <Gift className="h-5 w-5" />
+            Получить новый бонус
+          </button>
+        ) : (
+          <button type="button" onClick={onGetBonus} className="btn-primary flex w-full items-center justify-center gap-2">
+            <Gift className="h-5 w-5" />
+            {promoCode ? 'Оформить заявку' : `Забрать ${winterBonus} ₽`}
+          </button>
+        )}
         <div className="grid gap-3 sm:grid-cols-3">
-          <a href="https://kotel.ru" target="_blank" rel="noopener noreferrer" className="btn-secondary flex items-center justify-center gap-2">
+          <a
+            href="https://kotel.ru"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary flex items-center justify-center gap-2"
+          >
             <Calculator className="h-4 w-4" />
             Рассчитать монтаж
           </a>
-          <a href="https://kotel.ru" target="_blank" rel="noopener noreferrer" className="btn-secondary flex items-center justify-center gap-2">
+          <a
+            href="https://kotel.ru"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-secondary flex items-center justify-center gap-2"
+          >
             <Flame className="h-4 w-4" />
             Подобрать котёл
           </a>

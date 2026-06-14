@@ -1,8 +1,10 @@
 import { useState, FormEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Send, CheckCircle, Tag } from 'lucide-react'
+import { Send, CheckCircle, Tag, Banknote, Calendar } from 'lucide-react'
 import { SETTLEMENTS } from '../data/settlements'
 import { BONUS_DISCLAIMER } from '../data/rewards'
+import { formatDate } from '../services/promo'
+import { submitLead } from '../services/leads'
 
 const INTEREST_OPTIONS = [
   'Покупка котла',
@@ -14,10 +16,21 @@ const INTEREST_OPTIONS = [
 
 interface LeadFormProps {
   promoCode: string
+  bonusAmount: number
+  promoExpiresAt: string
+  completedLevels: number[]
   onBack: () => void
+  onSubmitted?: () => void
 }
 
-export function LeadForm({ promoCode, onBack }: LeadFormProps) {
+export function LeadForm({
+  promoCode,
+  bonusAmount,
+  promoExpiresAt,
+  completedLevels,
+  onBack,
+  onSubmitted,
+}: LeadFormProps) {
   const [submitted, setSubmitted] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [form, setForm] = useState({
@@ -25,9 +38,7 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
     phone: '',
     settlement: '',
     interest: '',
-    boilerBrand: '',
     comment: '',
-    promo: promoCode,
     consent: false,
   })
 
@@ -46,6 +57,20 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
   const handleSubmit = (ev: FormEvent) => {
     ev.preventDefault()
     if (!validate()) return
+
+    submitLead({
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      settlement: form.settlement,
+      interest: form.interest,
+      comment: form.comment.trim(),
+      completedLevels,
+      bonusAmount,
+      promoCode,
+      promoExpiresAt,
+    })
+
+    onSubmitted?.()
     setSubmitted(true)
   }
 
@@ -59,12 +84,16 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-green-500/40 bg-green-950/40 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
           <CheckCircle className="h-9 w-9 text-green-400" />
         </div>
-        <h2 className="heading-display text-2xl">Заявка подготовлена</h2>
+        <h2 className="heading-display text-2xl">Заявка сохранена</h2>
         <p className="max-w-sm text-steel-400">
           Мы свяжемся с вами и подскажем условия по зимнему бонусу.
         </p>
+        <p className="text-sm text-steel-500">
+          Промокод <span className="font-semibold text-warm-400">{promoCode}</span> действует до{' '}
+          {formatDate(promoExpiresAt)}
+        </p>
         <button type="button" onClick={onBack} className="btn-secondary mt-2">
-          Вернуться к результатам
+          Вернуться к игре
         </button>
       </motion.div>
     )
@@ -79,49 +108,75 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
     >
       <div>
         <h2 className="heading-display text-2xl">Получить зимний бонус</h2>
-        <p className="mt-1 text-sm text-steel-400">Заполните форму — промокод уже подставлен</p>
+        <p className="mt-1 text-sm text-steel-400">Заполните заявку — бонус и промокод уже подставлены</p>
       </div>
 
-      <div className="promo-block !p-4 !text-left">
-        <div className="flex items-center gap-2 text-steel-400">
-          <Tag className="h-4 w-4 text-warm-500" />
-          <span className="text-xs uppercase tracking-wider">Ваш промокод</span>
-        </div>
-        <p className="promo-shine mt-1 text-2xl font-black tracking-wider">{form.promo}</p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <ReadonlyField icon={<Banknote className="h-4 w-4" />} label="Сумма бонуса" value={`${bonusAmount} ₽`} />
+        <ReadonlyField icon={<Tag className="h-4 w-4" />} label="Промокод" value={promoCode} highlight />
+        <ReadonlyField
+          icon={<Calendar className="h-4 w-4" />}
+          label="Действует до"
+          value={formatDate(promoExpiresAt)}
+        />
       </div>
 
       <Field label="Имя *" error={errors.name}>
-        <input className="input-field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Как к вам обращаться" />
+        <input
+          className="input-field"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          placeholder="Как к вам обращаться"
+        />
       </Field>
 
       <Field label="Телефон *" error={errors.phone}>
-        <input className="input-field" type="tel" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} placeholder="+7 (___) ___-__-__" />
+        <input
+          className="input-field"
+          type="tel"
+          value={form.phone}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          placeholder="+7 (___) ___-__-__"
+        />
       </Field>
 
       <Field label="Населённый пункт *" error={errors.settlement}>
-        <select className="input-field" value={form.settlement} onChange={(e) => setForm({ ...form, settlement: e.target.value })}>
+        <select
+          className="input-field"
+          value={form.settlement}
+          onChange={(e) => setForm({ ...form, settlement: e.target.value })}
+        >
           <option value="">Выберите...</option>
           {SETTLEMENTS.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
       </Field>
 
       <Field label="Что вас интересует? *" error={errors.interest}>
-        <select className="input-field" value={form.interest} onChange={(e) => setForm({ ...form, interest: e.target.value })}>
+        <select
+          className="input-field"
+          value={form.interest}
+          onChange={(e) => setForm({ ...form, interest: e.target.value })}
+        >
           <option value="">Выберите...</option>
           {INTEREST_OPTIONS.map((o) => (
-            <option key={o} value={o}>{o}</option>
+            <option key={o} value={o}>
+              {o}
+            </option>
           ))}
         </select>
       </Field>
 
-      <Field label="Марка котла (если уже выбрали)">
-        <input className="input-field" value={form.boilerBrand} onChange={(e) => setForm({ ...form, boilerBrand: e.target.value })} placeholder="Необязательно" />
-      </Field>
-
       <Field label="Комментарий">
-        <textarea className="input-field min-h-[88px] resize-y" value={form.comment} onChange={(e) => setForm({ ...form, comment: e.target.value })} placeholder="Дополнительные пожелания" />
+        <textarea
+          className="input-field min-h-[88px] resize-y"
+          value={form.comment}
+          onChange={(e) => setForm({ ...form, comment: e.target.value })}
+          placeholder="Дополнительные пожелания"
+        />
       </Field>
 
       <label className="flex gap-3 rounded-xl border border-steel-600/30 bg-graphite-900/50 p-4 text-sm text-steel-400">
@@ -133,9 +188,14 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
         />
         <span>
           Я соглашаюсь на{' '}
-          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">обработку персональных данных</a>
-          {' '}и принимаю{' '}
-          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">Политику конфиденциальности</a>.
+          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">
+            обработку персональных данных
+          </a>{' '}
+          и принимаю{' '}
+          <a href="/privacy" className="text-warm-400 underline hover:text-warm-300">
+            Политику конфиденциальности
+          </a>
+          .
         </span>
       </label>
       {errors.consent && <p className="text-xs text-red-400">{errors.consent}</p>}
@@ -155,12 +215,46 @@ export function LeadForm({ promoCode, onBack }: LeadFormProps) {
   )
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string
+  error?: string
+  children: React.ReactNode
+}) {
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-steel-500">{label}</label>
+      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-steel-500">
+        {label}
+      </label>
       {children}
       {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+    </div>
+  )
+}
+
+function ReadonlyField({
+  icon,
+  label,
+  value,
+  highlight = false,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string
+  highlight?: boolean
+}) {
+  return (
+    <div className="promo-block !p-3 !text-left">
+      <div className="flex items-center gap-2 text-steel-400">
+        <span className="text-warm-500">{icon}</span>
+        <span className="text-[10px] uppercase tracking-wider">{label}</span>
+      </div>
+      <p className={`mt-1 text-sm font-semibold ${highlight ? 'promo-shine tracking-wider' : 'text-warm-300'}`}>
+        {value}
+      </p>
     </div>
   )
 }
