@@ -149,6 +149,15 @@
     text-shadow: 0 0 12px rgba(232, 146, 58, 0.45);
   }
 
+  .success-badge {
+    @apply flex h-16 w-16 items-center justify-center rounded-full text-warm-400;
+    border: 1px solid rgba(234, 88, 12, 0.42);
+    background: rgba(234, 88, 12, 0.1);
+    box-shadow:
+      0 0 28px rgba(234, 88, 12, 0.22),
+      inset 0 0 20px rgba(234, 88, 12, 0.06);
+  }
+
   .contact-section-title {
     font-size: 0.875rem;
     line-height: 1.35;
@@ -166,13 +175,13 @@
   }
 
   .contact-card {
-    @apply flex min-h-[108px] flex-col items-center justify-center gap-2.5 rounded-xl
-      border border-steel-600/40 bg-graphite-900/90 px-3 py-4 text-center
+    @apply flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-xl
+      border border-steel-600/40 bg-graphite-900/90 px-2.5 py-3 text-center
       touch-manipulation transition-all duration-200 ease-out active:scale-[0.98];
   }
 
   .contact-card-icon {
-    @apply flex h-11 w-11 shrink-0 items-center justify-center;
+    @apply flex shrink-0 items-center justify-center;
   }
 
   .contact-card-icon-phone {
@@ -189,18 +198,25 @@
   }
 
   .contact-card-label {
-    @apply text-sm font-semibold leading-snug text-gray-100 sm:text-base;
+    @apply text-xs font-semibold leading-snug text-gray-100 sm:text-sm;
   }
 
   .contact-card-label-phone {
-    font-size: 0.8125rem;
-    white-space: nowrap;
+    @apply flex flex-col items-center gap-0.5;
     letter-spacing: -0.01em;
   }
 
-  @media (min-width: 640px) {
+  .contact-card-phone-line {
+    @apply block leading-tight;
+  }
+
+  @media (max-width: 639px) {
     .contact-card-label-phone {
-      font-size: 0.875rem;
+      @apply flex-row flex-wrap justify-center gap-x-1 whitespace-nowrap;
+    }
+
+    .contact-card-phone-line {
+      @apply inline;
     }
   }
 

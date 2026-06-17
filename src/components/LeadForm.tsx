@@ -109,8 +109,8 @@ export function LeadForm({
         animate={{ opacity: 1, scale: 1 }}
         className="glass-panel-strong flex flex-col items-center gap-5 p-6 text-center sm:p-10"
       >
-        <div className="flex h-16 w-16 items-center justify-center rounded-full border border-green-500/40 bg-green-950/40 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
-          <CheckCircle className="h-9 w-9 text-green-400" />
+        <div className="success-badge">
+          <CheckCircle className="h-9 w-9" />
         </div>
 
         <div className="flex flex-col gap-2">
@@ -138,9 +138,12 @@ export function LeadForm({
           <div className="contact-cards">
             <a href={KOTEL_PHONE} className="contact-card contact-card-phone">
               <span className="contact-card-icon contact-card-icon-phone" aria-hidden="true">
-                <Phone className="h-9 w-9" />
+                <Phone className="h-[42px] w-[42px]" strokeWidth={1.75} />
               </span>
-              <span className="contact-card-label contact-card-label-phone">+7 (919) 115-24-43</span>
+              <span className="contact-card-label contact-card-label-phone">
+                <span className="contact-card-phone-line">+7 (919)</span>
+                <span className="contact-card-phone-line">115-24-43</span>
+              </span>
             </a>
             <a
               href={KOTEL_VK}
@@ -149,7 +152,7 @@ export function LeadForm({
               className="contact-card contact-card-vk"
             >
               <span className="contact-card-icon contact-card-icon-vk" aria-hidden="true">
-                <img src={VK_ICON} alt="" width={34} height={34} className="h-[34px] w-[34px]" />
+                <img src={VK_ICON} alt="" width={46} height={46} className="h-[46px] w-[46px]" />
               </span>
               <span className="contact-card-label">ВКонтакте</span>
             </a>
@@ -160,7 +163,7 @@ export function LeadForm({
               className="contact-card contact-card-max"
             >
               <span className="contact-card-icon contact-card-icon-max" aria-hidden="true">
-                <img src={MAX_ICON} alt="" width={34} height={34} className="h-[34px] w-[34px]" />
+                <img src={MAX_ICON} alt="" width={46} height={46} className="h-[46px] w-[46px]" />
               </span>
               <span className="contact-card-label">MAX</span>
             </a>
@@ -168,14 +171,14 @@ export function LeadForm({
         </div>
 
         <p className="mt-6 text-xs leading-relaxed text-steel-500">
-          Мини-игра разработана{' '}
+          Разработка игры —{' '}
           <a
             href={AUTHOR_VK}
             target="_blank"
             rel="noopener noreferrer"
             className="author-credit-link font-medium text-warm-400 transition-all hover:text-warm-300"
           >
-            Татьяной Громовой
+            Татьяна Громова
           </a>
         </p>
 
