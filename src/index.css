@@ -149,6 +149,55 @@
     text-shadow: 0 0 12px rgba(232, 146, 58, 0.45);
   }
 
+  .contact-btn {
+    @apply flex w-full min-h-[52px] items-center justify-center gap-2.5 rounded-xl px-4 py-3
+      text-sm font-semibold touch-manipulation transition-all duration-200
+      active:scale-[0.98] sm:text-base;
+  }
+
+  .contact-btn-phone {
+    @apply relative overflow-hidden text-white;
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 50%, #9a3412 100%);
+    box-shadow:
+      0 0 30px rgba(234, 88, 12, 0.4),
+      0 4px 20px rgba(0, 0, 0, 0.4),
+      inset 0 1px 0 rgba(255, 200, 150, 0.25);
+  }
+
+  .contact-btn-phone:hover {
+    box-shadow:
+      0 0 45px rgba(255, 140, 66, 0.5),
+      0 6px 28px rgba(0, 0, 0, 0.45),
+      inset 0 1px 0 rgba(255, 200, 150, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .contact-btn-vk {
+    @apply border border-steel-600/40 bg-graphite-900/95 text-white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .contact-btn-vk:hover {
+    border-color: rgba(59, 130, 246, 0.45);
+    box-shadow:
+      0 0 28px rgba(59, 130, 246, 0.35),
+      0 4px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .contact-btn-max {
+    @apply border border-steel-600/40 bg-graphite-900/95 text-white;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  }
+
+  .contact-btn-max:hover {
+    border-color: rgba(168, 85, 247, 0.45);
+    box-shadow:
+      0 0 28px rgba(168, 85, 247, 0.35),
+      0 4px 20px rgba(0, 0, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
   .option-btn {
     @apply relative w-full overflow-hidden rounded-xl border border-steel-600/35
       bg-gradient-to-br from-graphite-800/90 to-graphite-900/90 px-5 py-4 text-left

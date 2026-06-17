@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Send, CheckCircle, Tag, Banknote, Calendar, Phone, MessageCircle } from 'lucide-react'
+import { Send, CheckCircle, Tag, Banknote, Calendar, Phone } from 'lucide-react'
 import { SETTLEMENTS } from '../data/settlements'
 import { BONUS_DISCLAIMER } from '../data/rewards'
 import { PERSONAL_DATA_CONSENT, PRIVACY_POLICY } from '../data/legalTexts'
@@ -14,6 +14,8 @@ const KOTEL_PHONE = 'tel:+79191152443'
 const KOTEL_VK = 'https://vk.me/gazkotelsatka'
 const KOTEL_MAX = 'https://max.ru/u/f9LHodD0cOJFb-0Hk-PV5blrkLmGEaUP8Q4Y3My8WCZtHL3TokbHttXSVdw'
 const AUTHOR_VK = 'https://vk.com/tavi_grom'
+const VK_ICON = `${import.meta.env.BASE_URL}assets/images/vk-icon.png`
+const MAX_ICON = `${import.meta.env.BASE_URL}assets/images/max-icon.png`
 
 const INTEREST_OPTIONS = [
   'Покупка котла',
@@ -129,26 +131,26 @@ export function LeadForm({
 
         <div className="flex w-full max-w-sm flex-col gap-2">
           <p className="text-xs uppercase tracking-wider text-steel-500">Связь с сервисным центром «КотёлЪ»</p>
-          <a href={KOTEL_PHONE} className="btn-primary flex w-full items-center justify-center gap-2">
-            <Phone className="h-5 w-5" />
-            Позвонить
+          <a href={KOTEL_PHONE} className="contact-btn contact-btn-phone">
+            <Phone className="h-5 w-5 shrink-0" />
+            +7 (919) 115-24-43
           </a>
           <a
             href={KOTEL_VK}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary flex w-full items-center justify-center gap-2"
+            className="contact-btn contact-btn-vk"
           >
-            <MessageCircle className="h-5 w-5" />
+            <img src={VK_ICON} alt="" width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
             Написать ВКонтакте
           </a>
           <a
             href={KOTEL_MAX}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-primary flex w-full items-center justify-center gap-2"
+            className="contact-btn contact-btn-max"
           >
-            <MessageCircle className="h-5 w-5" />
+            <img src={MAX_ICON} alt="" width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
             Написать в MAX
           </a>
         </div>
