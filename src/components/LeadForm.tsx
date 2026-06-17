@@ -138,12 +138,9 @@ export function LeadForm({
           <div className="contact-cards">
             <a href={KOTEL_PHONE} className="contact-card contact-card-phone">
               <span className="contact-card-icon contact-card-icon-phone" aria-hidden="true">
-                <Phone className="h-[42px] w-[42px]" strokeWidth={1.75} />
+                <Phone strokeWidth={1.75} />
               </span>
-              <span className="contact-card-label contact-card-label-phone">
-                <span className="contact-card-phone-line">+7 (919)</span>
-                <span className="contact-card-phone-line">115-24-43</span>
-              </span>
+              <span className="contact-card-label contact-card-label-phone">+7 (919) 115-24-43</span>
             </a>
             <a
               href={KOTEL_VK}
@@ -152,7 +149,7 @@ export function LeadForm({
               className="contact-card contact-card-vk"
             >
               <span className="contact-card-icon contact-card-icon-vk" aria-hidden="true">
-                <img src={VK_ICON} alt="" width={46} height={46} className="h-[46px] w-[46px]" />
+                <img src={VK_ICON} alt="" />
               </span>
               <span className="contact-card-label">ВКонтакте</span>
             </a>
@@ -163,7 +160,7 @@ export function LeadForm({
               className="contact-card contact-card-max"
             >
               <span className="contact-card-icon contact-card-icon-max" aria-hidden="true">
-                <img src={MAX_ICON} alt="" width={46} height={46} className="h-[46px] w-[46px]" />
+                <img src={MAX_ICON} alt="" />
               </span>
               <span className="contact-card-label">MAX</span>
             </a>

@@ -171,17 +171,22 @@
   }
 
   .contact-cards {
-    @apply grid grid-cols-1 gap-3 sm:grid-cols-3;
+    @apply grid grid-cols-3 gap-2;
   }
 
   .contact-card {
-    @apply flex min-h-[92px] flex-col items-center justify-center gap-2 rounded-xl
-      border border-steel-600/40 bg-graphite-900/90 px-2.5 py-3 text-center
+    @apply flex h-[84px] min-w-0 flex-col items-center justify-center gap-1 rounded-xl
+      border border-steel-600/40 bg-graphite-900/90 px-1 py-2 text-center
       touch-manipulation transition-all duration-200 ease-out active:scale-[0.98];
   }
 
   .contact-card-icon {
-    @apply flex shrink-0 items-center justify-center;
+    @apply flex h-11 w-11 shrink-0 items-center justify-center;
+  }
+
+  .contact-card-icon svg,
+  .contact-card-icon img {
+    @apply block h-11 w-11 object-contain;
   }
 
   .contact-card-icon-phone {
@@ -198,26 +203,13 @@
   }
 
   .contact-card-label {
-    @apply text-xs font-semibold leading-snug text-gray-100 sm:text-sm;
+    @apply max-w-full truncate px-0.5 font-semibold leading-none text-gray-100;
+    font-size: clamp(0.5625rem, 2.15vw, 0.6875rem);
   }
 
   .contact-card-label-phone {
-    @apply flex flex-col items-center gap-0.5;
-    letter-spacing: -0.01em;
-  }
-
-  .contact-card-phone-line {
-    @apply block leading-tight;
-  }
-
-  @media (max-width: 639px) {
-    .contact-card-label-phone {
-      @apply flex-row flex-wrap justify-center gap-x-1 whitespace-nowrap;
-    }
-
-    .contact-card-phone-line {
-      @apply inline;
-    }
+    white-space: nowrap;
+    letter-spacing: -0.04em;
   }
 
   .contact-card-phone {
