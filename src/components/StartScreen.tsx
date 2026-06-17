@@ -65,6 +65,23 @@ export function StartScreen({ onStart }: StartScreenProps) {
         </button>
       </motion.div>
 
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.45 }}
+        className="pb-2 text-center text-xs text-steel-500"
+      >
+        Разработка игры —{' '}
+        <a
+          href="https://vk.com/tavi_grom"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="author-credit-link font-medium text-warm-400 transition-all hover:text-warm-300"
+        >
+          Татьяна Громова
+        </a>
+      </motion.p>
+
       <AnimatePresence>
         {showHelp && (
           <motion.div
