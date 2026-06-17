@@ -149,53 +149,53 @@
     text-shadow: 0 0 12px rgba(232, 146, 58, 0.45);
   }
 
-  .contact-btn {
-    @apply flex w-full min-h-[52px] items-center justify-center gap-2.5 rounded-xl px-4 py-3
-      text-sm font-semibold touch-manipulation transition-all duration-200
-      active:scale-[0.98] sm:text-base;
+  .contact-cards {
+    @apply grid grid-cols-1 gap-3 sm:grid-cols-3;
   }
 
-  .contact-btn-phone {
-    @apply relative overflow-hidden text-white;
-    background: linear-gradient(135deg, #ea580c 0%, #c2410c 50%, #9a3412 100%);
-    box-shadow:
-      0 0 30px rgba(234, 88, 12, 0.4),
-      0 4px 20px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 200, 150, 0.25);
+  .contact-card {
+    @apply flex min-h-[108px] flex-col items-center justify-center gap-2.5 rounded-xl
+      border border-steel-600/40 bg-graphite-900/90 p-4 text-center
+      touch-manipulation transition-all duration-200 ease-out active:scale-[0.98];
   }
 
-  .contact-btn-phone:hover {
-    box-shadow:
-      0 0 45px rgba(255, 140, 66, 0.5),
-      0 6px 28px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 rgba(255, 200, 150, 0.3);
-    transform: translateY(-1px);
+  .contact-card-icon {
+    @apply flex h-9 w-9 shrink-0 items-center justify-center;
   }
 
-  .contact-btn-vk {
-    @apply border border-steel-600/40 bg-graphite-900/95 text-white;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  .contact-card-icon-phone {
+    @apply text-warm-400;
   }
 
-  .contact-btn-vk:hover {
+  .contact-card-label {
+    @apply text-sm font-semibold leading-snug text-gray-100 sm:text-base;
+  }
+
+  .contact-card-phone {
+    border-color: rgba(234, 88, 12, 0.35);
+    background: linear-gradient(180deg, rgba(234, 88, 12, 0.14) 0%, rgba(15, 20, 28, 0.96) 100%);
+  }
+
+  .contact-card-phone .contact-card-label {
+    @apply text-warm-300;
+  }
+
+  .contact-card-phone:hover {
+    border-color: rgba(234, 88, 12, 0.55);
+    box-shadow: 0 0 28px rgba(234, 88, 12, 0.32);
+    transform: translateY(-2px);
+  }
+
+  .contact-card-vk:hover {
     border-color: rgba(59, 130, 246, 0.45);
-    box-shadow:
-      0 0 28px rgba(59, 130, 246, 0.35),
-      0 4px 20px rgba(0, 0, 0, 0.4);
-    transform: translateY(-1px);
+    box-shadow: 0 0 28px rgba(59, 130, 246, 0.28);
+    transform: translateY(-2px);
   }
 
-  .contact-btn-max {
-    @apply border border-steel-600/40 bg-graphite-900/95 text-white;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-  }
-
-  .contact-btn-max:hover {
+  .contact-card-max:hover {
     border-color: rgba(168, 85, 247, 0.45);
-    box-shadow:
-      0 0 28px rgba(168, 85, 247, 0.35),
-      0 4px 20px rgba(0, 0, 0, 0.4);
-    transform: translateY(-1px);
+    box-shadow: 0 0 28px rgba(168, 85, 247, 0.28);
+    transform: translateY(-2px);
   }
 
   .option-btn {

@@ -129,33 +129,43 @@ export function LeadForm({
           </p>
         </div>
 
-        <div className="flex w-full max-w-sm flex-col gap-2">
-          <p className="text-xs uppercase tracking-wider text-steel-500">Связь с сервисным центром «КотёлЪ»</p>
-          <a href={KOTEL_PHONE} className="contact-btn contact-btn-phone">
-            <Phone className="h-5 w-5 shrink-0" />
-            +7 (919) 115-24-43
-          </a>
-          <a
-            href={KOTEL_VK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="contact-btn contact-btn-vk"
-          >
-            <img src={VK_ICON} alt="" width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
-            Написать ВКонтакте
-          </a>
-          <a
-            href={KOTEL_MAX}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="contact-btn contact-btn-max"
-          >
-            <img src={MAX_ICON} alt="" width={26} height={26} className="h-[26px] w-[26px] shrink-0" />
-            Написать в MAX
-          </a>
+        <div className="w-full max-w-lg">
+          <p className="mb-3 text-xs uppercase tracking-wider text-steel-500">
+            Связь с сервисным центром «КотёлЪ»
+          </p>
+          <div className="contact-cards">
+            <a href={KOTEL_PHONE} className="contact-card contact-card-phone">
+              <span className="contact-card-icon contact-card-icon-phone" aria-hidden="true">
+                <Phone className="h-7 w-7" />
+              </span>
+              <span className="contact-card-label">+7 (919) 115-24-43</span>
+            </a>
+            <a
+              href={KOTEL_VK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-card contact-card-vk"
+            >
+              <span className="contact-card-icon" aria-hidden="true">
+                <img src={VK_ICON} alt="" width={28} height={28} className="h-7 w-7" />
+              </span>
+              <span className="contact-card-label">ВКонтакте</span>
+            </a>
+            <a
+              href={KOTEL_MAX}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="contact-card contact-card-max"
+            >
+              <span className="contact-card-icon" aria-hidden="true">
+                <img src={MAX_ICON} alt="" width={28} height={28} className="h-7 w-7" />
+              </span>
+              <span className="contact-card-label">MAX</span>
+            </a>
+          </div>
         </div>
 
-        <p className="mt-1 text-xs leading-relaxed text-steel-500">
+        <p className="mt-6 text-xs leading-relaxed text-steel-500">
           Мини-игра разработана{' '}
           <a
             href={AUTHOR_VK}
