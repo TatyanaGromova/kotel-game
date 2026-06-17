@@ -115,14 +115,16 @@ export function LeadForm({
 
         <div className="flex flex-col gap-2">
           <h2 className="heading-display text-2xl">Заявка отправлена</h2>
-          <p className="max-w-sm text-steel-400">
-            Мы свяжемся с вами и подскажем условия по бонусу.
+          <p className="max-w-md text-sm leading-relaxed text-steel-400 sm:text-base">
+            Мы получили вашу заявку и свяжемся с вами, чтобы уточнить детали и закрепить бонус.
           </p>
         </div>
 
         <div className="promo-block w-full max-w-sm !p-4">
           <p className="text-xs uppercase tracking-wider text-steel-400">Ваш промокод</p>
-          <p className="promo-shine mt-1 text-2xl font-black tracking-wider">{promoCode}</p>
+          <p className="promo-shine mt-1 break-all text-2xl font-black tracking-wider sm:text-3xl">
+            {promoCode}
+          </p>
           <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-steel-500">
             <Calendar className="h-3.5 w-3.5 shrink-0" />
             Действует до {formatDate(promoExpiresAt)}
@@ -130,15 +132,15 @@ export function LeadForm({
         </div>
 
         <div className="w-full max-w-lg">
-          <p className="mb-3 text-xs uppercase tracking-wider text-steel-500">
-            Связь с сервисным центром «КотёлЪ»
+          <p className="contact-section-title mb-3">
+            Связаться с сервисным центром «КотёлЪ»
           </p>
           <div className="contact-cards">
             <a href={KOTEL_PHONE} className="contact-card contact-card-phone">
               <span className="contact-card-icon contact-card-icon-phone" aria-hidden="true">
-                <Phone className="h-7 w-7" />
+                <Phone className="h-9 w-9" />
               </span>
-              <span className="contact-card-label">+7 (919) 115-24-43</span>
+              <span className="contact-card-label contact-card-label-phone">+7 (919) 115-24-43</span>
             </a>
             <a
               href={KOTEL_VK}
@@ -146,8 +148,8 @@ export function LeadForm({
               rel="noopener noreferrer"
               className="contact-card contact-card-vk"
             >
-              <span className="contact-card-icon" aria-hidden="true">
-                <img src={VK_ICON} alt="" width={28} height={28} className="h-7 w-7" />
+              <span className="contact-card-icon contact-card-icon-vk" aria-hidden="true">
+                <img src={VK_ICON} alt="" width={34} height={34} className="h-[34px] w-[34px]" />
               </span>
               <span className="contact-card-label">ВКонтакте</span>
             </a>
@@ -157,8 +159,8 @@ export function LeadForm({
               rel="noopener noreferrer"
               className="contact-card contact-card-max"
             >
-              <span className="contact-card-icon" aria-hidden="true">
-                <img src={MAX_ICON} alt="" width={28} height={28} className="h-7 w-7" />
+              <span className="contact-card-icon contact-card-icon-max" aria-hidden="true">
+                <img src={MAX_ICON} alt="" width={34} height={34} className="h-[34px] w-[34px]" />
               </span>
               <span className="contact-card-label">MAX</span>
             </a>
@@ -182,7 +184,7 @@ export function LeadForm({
           onClick={onBack}
           className="mt-1 text-sm text-steel-500 underline decoration-steel-600/50 underline-offset-2 transition-colors hover:text-steel-400"
         >
-          Вернуться к уровням
+          Пройти игру заново
         </button>
       </motion.div>
     )
