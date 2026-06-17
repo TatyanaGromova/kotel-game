@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react'
 import { motion } from 'framer-motion'
-import { Send, CheckCircle, Tag, Banknote, Calendar } from 'lucide-react'
+import { Send, CheckCircle, Tag, Banknote, Calendar, Phone, MessageCircle } from 'lucide-react'
 import { SETTLEMENTS } from '../data/settlements'
 import { BONUS_DISCLAIMER } from '../data/rewards'
 import { PERSONAL_DATA_CONSENT, PRIVACY_POLICY } from '../data/legalTexts'
@@ -9,6 +9,11 @@ import { submitLead } from '../services/leads'
 import { LegalModal } from './LegalModal'
 
 type LegalModalType = 'consent' | 'privacy' | null
+
+const KOTEL_PHONE = 'tel:+79191152443'
+const KOTEL_VK = 'https://vk.me/gazkotelsatka'
+const KOTEL_MAX = 'https://max.ru/u/f9LHodD0cOJFb-0Hk-PV5blrkLmGEaUP8Q4Y3My8WCZtHL3TokbHttXSVdw'
+const AUTHOR_VK = 'https://vk.com/tavi_grom'
 
 const INTEREST_OPTIONS = [
   'Покупка котла',
@@ -100,21 +105,72 @@ export function LeadForm({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass-panel-strong flex flex-col items-center gap-5 p-10 text-center"
+        className="glass-panel-strong flex flex-col items-center gap-5 p-6 text-center sm:p-10"
       >
         <div className="flex h-16 w-16 items-center justify-center rounded-full border border-green-500/40 bg-green-950/40 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
           <CheckCircle className="h-9 w-9 text-green-400" />
         </div>
-        <h2 className="heading-display text-2xl">Заявка отправлена</h2>
-        <p className="max-w-sm text-steel-400">
-          Мы свяжемся с вами и подскажем условия по бонусу.
+
+        <div className="flex flex-col gap-2">
+          <h2 className="heading-display text-2xl">Заявка отправлена</h2>
+          <p className="max-w-sm text-steel-400">
+            Мы свяжемся с вами и подскажем условия по бонусу.
+          </p>
+        </div>
+
+        <div className="promo-block w-full max-w-sm !p-4">
+          <p className="text-xs uppercase tracking-wider text-steel-400">Ваш промокод</p>
+          <p className="promo-shine mt-1 text-2xl font-black tracking-wider">{promoCode}</p>
+          <p className="mt-2 flex items-center justify-center gap-1.5 text-sm text-steel-500">
+            <Calendar className="h-3.5 w-3.5 shrink-0" />
+            Действует до {formatDate(promoExpiresAt)}
+          </p>
+        </div>
+
+        <div className="flex w-full max-w-sm flex-col gap-2">
+          <p className="text-xs uppercase tracking-wider text-steel-500">Связь с сервисным центром «КотёлЪ»</p>
+          <a href={KOTEL_PHONE} className="btn-primary flex w-full items-center justify-center gap-2">
+            <Phone className="h-5 w-5" />
+            Позвонить
+          </a>
+          <a
+            href={KOTEL_VK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary flex w-full items-center justify-center gap-2"
+          >
+            <MessageCircle className="h-5 w-5" />
+            Написать ВКонтакте
+          </a>
+          <a
+            href={KOTEL_MAX}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary flex w-full items-center justify-center gap-2"
+          >
+            <MessageCircle className="h-5 w-5" />
+            Написать в MAX
+          </a>
+        </div>
+
+        <p className="mt-1 text-xs leading-relaxed text-steel-500">
+          Мини-игра разработана{' '}
+          <a
+            href={AUTHOR_VK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="author-credit-link font-medium text-warm-400 transition-all hover:text-warm-300"
+          >
+            Татьяной Громовой
+          </a>
         </p>
-        <p className="text-sm text-steel-500">
-          Промокод <span className="font-semibold text-warm-400">{promoCode}</span> действует до{' '}
-          {formatDate(promoExpiresAt)}
-        </p>
-        <button type="button" onClick={onBack} className="btn-secondary mt-2">
-          К уровням
+
+        <button
+          type="button"
+          onClick={onBack}
+          className="mt-1 text-sm text-steel-500 underline decoration-steel-600/50 underline-offset-2 transition-colors hover:text-steel-400"
+        >
+          Вернуться к уровням
         </button>
       </motion.div>
     )

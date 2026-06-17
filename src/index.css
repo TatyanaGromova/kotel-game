@@ -145,6 +145,10 @@
       hover:text-warm-400;
   }
 
+  .author-credit-link:hover {
+    text-shadow: 0 0 12px rgba(232, 146, 58, 0.45);
+  }
+
   .option-btn {
     @apply relative w-full overflow-hidden rounded-xl border border-steel-600/35
       bg-gradient-to-br from-graphite-800/90 to-graphite-900/90 px-5 py-4 text-left
